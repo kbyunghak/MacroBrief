@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { apiClient } from "../lib/api-client";
 import { formatSummaryUpdatedLabel } from "../lib/dashboard-format";
+import { buildRefreshNotice, getFailuresCount, normalizeHoldingsErrorMessage } from "../lib/dashboard-state";
 import { ImpactCardsClient } from "./ImpactCardsClient";
 import { LiveAlertsClient } from "./LiveAlertsClient";
 import type { DashboardSummary, Holding, ImpactCard, LiveAlert, MacroMapItem } from "../types/api";
@@ -43,13 +44,6 @@ export function DashboardClient({
   const canAddHolding = !holdingsBusy && normalizedSymbol.length > 0;
   const refreshDisabled = refreshBusy || holdingsBusy || insightsBusy || refreshCooldownSec > 0;
   const lastUpdatedLabel = formatSummaryUpdatedLabel(summary.lastUpdatedAt);
-
-  function normalizeHoldingsErrorMessage(raw: string) {
-    if (raw.includes("duplicate_symbol")) return "This symbol is already in your holdings.";
-    if (raw.includes("invalid_symbol")) return "Symbol format is invalid.";
-    if (raw.includes("request_failed")) return "Request failed. Please try again shortly.";
-    return raw;
-  }
 
   async function refreshAll() {
     const [nextSummary, nextHoldings, nextImpactCards, nextLiveAlerts, nextMacroMap] = await Promise.allSettled([
@@ -100,12 +94,14 @@ export function DashboardClient({
       setInsightsError("");
     }
 
-    const failuresCount = [nextSummary, nextHoldings, nextImpactCards, nextLiveAlerts, nextMacroMap].filter((x) => x.status !== "fulfilled").length;
-    if (failuresCount === 0) {
-      setRefreshNotice("Refresh complete.");
-    } else {
-      setRefreshNotice(`Refresh completed with ${failuresCount} partial failure(s).`);
-    }
+    const failuresCount = getFailuresCount([
+      nextSummary.status,
+      nextHoldings.status,
+      nextImpactCards.status,
+      nextLiveAlerts.status,
+      nextMacroMap.status
+    ]);
+    setRefreshNotice(buildRefreshNotice(failuresCount));
   }
 
   async function onManualRefresh() {
