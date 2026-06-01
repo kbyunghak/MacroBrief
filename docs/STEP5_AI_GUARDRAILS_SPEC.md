@@ -136,6 +136,7 @@ Step 5 is complete when:
 - API guardrail service scaffold implemented:
   - banned-term detection
   - max-length and required-phrase validation
+  - up to 2 regeneration attempts before fallback
   - safe fallback template generation
 - Audit log model and in-memory storage implemented:
   - prompt_version
@@ -158,7 +159,7 @@ Step 5 is complete when:
 - Banned language list fixed: Done
 - Validation/regeneration/fallback flow fixed: In progress
   - validation + fallback implemented
-  - explicit multi-regeneration strategy still pending
+  - multi-regeneration strategy implemented (max 2 attempts)
 - Example outputs approved: Pending
 - Unit/integration tests added for guardrail behavior and audit endpoint.
 

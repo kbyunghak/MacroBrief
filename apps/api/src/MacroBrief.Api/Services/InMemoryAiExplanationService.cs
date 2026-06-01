@@ -46,12 +46,34 @@ public class InMemoryAiExplanationService : IAiExplanationService
 
     public string BuildGuardedExplanation(string symbol, string macroFactor, string exposurePath, string candidateText, int score)
     {
-        var blockedTerms = FindBlockedTerms(candidateText);
-        var tooLong = candidateText.Length > _maxLengthChars;
-        var hasRequiredPhrase = candidateText.Contains(_requiredPhrase, StringComparison.OrdinalIgnoreCase);
-        var fallbackUsed = blockedTerms.Count > 0 || tooLong || !hasRequiredPhrase;
-        var regenerationCount = fallbackUsed ? 1 : 0;
-        var outputText = fallbackUsed ? BuildFallback(symbol, macroFactor, exposurePath) : candidateText;
+        var attemptText = candidateText;
+        var regenerationCount = 0;
+        const int maxRegeneration = 2;
+        var blockedTerms = new List<string>();
+        var failureCodes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        for (var attempt = 0; attempt <= maxRegeneration; attempt++)
+        {
+            blockedTerms = FindBlockedTerms(attemptText);
+            failureCodes = GetFailureCodes(attemptText, blockedTerms);
+            if (failureCodes.Count == 0)
+            {
+                break;
+            }
+
+            if (attempt == maxRegeneration)
+            {
+                break;
+            }
+
+            regenerationCount++;
+            attemptText = RegenerateCandidateText(symbol, macroFactor, exposurePath, attemptText);
+        }
+
+        blockedTerms = FindBlockedTerms(attemptText);
+        failureCodes = GetFailureCodes(attemptText, blockedTerms);
+        var fallbackUsed = failureCodes.Count > 0;
+        var outputText = fallbackUsed ? BuildFallback(symbol, macroFactor, exposurePath) : attemptText;
         var confidence = GetConfidence(score);
 
         _logs.Add(new AiExplanationAuditItem(
@@ -59,6 +81,7 @@ public class InMemoryAiExplanationService : IAiExplanationService
             MacroFactor: macroFactor,
             PromptVersion: _promptVersion,
             OutputText: outputText,
+            ValidationFailureCodes: failureCodes.ToList(),
             BlockedTermsDetected: blockedTerms,
             RegenerationCount: regenerationCount,
             FallbackUsed: fallbackUsed,
@@ -79,6 +102,37 @@ public class InMemoryAiExplanationService : IAiExplanationService
             .Where(p => text.Contains(p, StringComparison.OrdinalIgnoreCase))
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .ToList();
+    }
+
+    private HashSet<string> GetFailureCodes(string text, IReadOnlyList<string> blockedTerms)
+    {
+        var failureCodes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        if (blockedTerms.Count > 0) failureCodes.Add("banned_terms");
+        if (text.Length > _maxLengthChars) failureCodes.Add("too_long");
+        if (!text.Contains(_requiredPhrase, StringComparison.OrdinalIgnoreCase)) failureCodes.Add("missing_required_phrase");
+        return failureCodes;
+    }
+
+    private string RegenerateCandidateText(string symbol, string macroFactor, string exposurePath, string text)
+    {
+        var cleaned = text;
+        foreach (var banned in _bannedPatterns)
+        {
+            cleaned = cleaned.Replace(banned, string.Empty, StringComparison.OrdinalIgnoreCase);
+        }
+
+        if (!cleaned.Contains(_requiredPhrase, StringComparison.OrdinalIgnoreCase))
+        {
+            cleaned = $"This update may be relevant because changes in {macroFactor} can influence {symbol} through {exposurePath}.";
+        }
+
+        cleaned = cleaned.Trim();
+        if (cleaned.Length > _maxLengthChars)
+        {
+            cleaned = cleaned[.._maxLengthChars];
+        }
+
+        return cleaned;
     }
 
     private string BuildFallback(string symbol, string macroFactor, string exposurePath)
