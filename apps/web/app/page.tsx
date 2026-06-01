@@ -1,4 +1,6 @@
 import { apiClient } from "../src/lib/api-client";
+import { ImpactCardsClient } from "../src/components/ImpactCardsClient";
+import { LiveAlertsClient } from "../src/components/LiveAlertsClient";
 
 export const dynamic = "force-dynamic";
 
@@ -47,24 +49,12 @@ export default async function Page() {
         <div className="grid two">
           <section>
             <h2>Impact Cards</h2>
-            <ul>
-              {impactCards.map((card) => (
-                <li key={`${card.symbol}-${card.headline}`}>
-                  <strong>{card.symbol}</strong> [{card.impactLevel}] {card.headline}
-                </li>
-              ))}
-            </ul>
+            <ImpactCardsClient items={impactCards} />
           </section>
 
           <section>
             <h2>Live Alerts</h2>
-            <ul>
-              {liveAlerts.map((alert) => (
-                <li key={alert.id}>
-                  {alert.category} / {alert.severity}: {alert.message}
-                </li>
-              ))}
-            </ul>
+            <LiveAlertsClient initialItems={liveAlerts} />
           </section>
         </div>
 
