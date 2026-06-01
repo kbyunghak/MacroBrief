@@ -35,7 +35,16 @@ export function DashboardClient({
   const [insightsError, setInsightsError] = useState("");
 
   const pollingKey = useMemo(() => holdings.map((h) => h.symbol).join(","), [holdings]);
+  const normalizedSymbol = newSymbol.trim().toUpperCase();
+  const canAddHolding = !holdingsBusy && normalizedSymbol.length > 0;
   const lastUpdatedLabel = new Date(summary.lastUpdatedAt).toISOString().replace("T", " ").replace("Z", " UTC");
+
+  function normalizeHoldingsErrorMessage(raw: string) {
+    if (raw.includes("duplicate_symbol")) return "이미 등록된 종목입니다.";
+    if (raw.includes("invalid_symbol")) return "심볼 형식이 올바르지 않습니다.";
+    if (raw.includes("request_failed")) return "요청 처리에 실패했습니다. 잠시 후 다시 시도해 주세요.";
+    return raw;
+  }
 
   async function refreshAll() {
     const [nextSummary, nextHoldings, nextImpactCards, nextLiveAlerts, nextMacroMap] = await Promise.allSettled([
@@ -88,7 +97,7 @@ export function DashboardClient({
   }
 
   async function onAddHolding() {
-    const symbol = newSymbol.trim().toUpperCase();
+    const symbol = normalizedSymbol;
     if (!symbol) return;
 
     setHoldingsError("");
@@ -99,7 +108,8 @@ export function DashboardClient({
       setNewSymbol("");
       await refreshAll();
     } catch (error) {
-      setHoldingsError(error instanceof Error ? error.message : "Failed to add holding.");
+      const message = error instanceof Error ? error.message : "Failed to add holding.";
+      setHoldingsError(normalizeHoldingsErrorMessage(message));
     } finally {
       setHoldingsBusy(false);
       setInsightsBusy(false);
@@ -114,7 +124,8 @@ export function DashboardClient({
       await apiClient.deleteHolding(symbol);
       await refreshAll();
     } catch (error) {
-      setHoldingsError(error instanceof Error ? error.message : "Failed to remove holding.");
+      const message = error instanceof Error ? error.message : "Failed to remove holding.";
+      setHoldingsError(normalizeHoldingsErrorMessage(message));
     } finally {
       setHoldingsBusy(false);
       setInsightsBusy(false);
@@ -144,11 +155,20 @@ export function DashboardClient({
           <div>
             <input
               value={newSymbol}
-              onChange={(e) => setNewSymbol(e.target.value)}
+              onChange={(e) => {
+                setNewSymbol(e.target.value.toUpperCase());
+                if (holdingsError) setHoldingsError("");
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && canAddHolding) {
+                  e.preventDefault();
+                  void onAddHolding();
+                }
+              }}
               placeholder="Add symbol (e.g. SOFI)"
               disabled={holdingsBusy}
             />{" "}
-            <button onClick={onAddHolding} disabled={holdingsBusy}>
+            <button onClick={() => void onAddHolding()} disabled={!canAddHolding}>
               Add
             </button>
           </div>
