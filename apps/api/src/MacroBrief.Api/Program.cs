@@ -1,6 +1,7 @@
 ﻿var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
 builder.Services.AddSingleton<IHoldingsService, InMemoryHoldingsService>();
+builder.Services.AddSingleton<IPortfolioInsightsService, InMemoryPortfolioInsightsService>();
 
 var app = builder.Build();
 

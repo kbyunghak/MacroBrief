@@ -1,4 +1,5 @@
 using System.Net;
+using System.Text.Json;
 using Microsoft.AspNetCore.Mvc.Testing;
 
 public class PortfolioInsightsEndpointsTests : IClassFixture<WebApplicationFactory<Program>>
@@ -11,23 +12,39 @@ public class PortfolioInsightsEndpointsTests : IClassFixture<WebApplicationFacto
     }
 
     [Fact]
-    public async Task GetImpactCards_ReturnsOk()
+    public async Task GetImpactCards_ReturnsOkWithData()
     {
-        var response = await _client.GetAsync("/api/v1/dashboard/impact-cards");
+        var response = await _client.GetAsync("/api/v1/impact-cards");
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+        var items = json.RootElement.GetProperty("data");
+        Assert.True(items.GetArrayLength() > 0);
+        Assert.Equal("NVDA", items[0].GetProperty("symbol").GetString());
     }
 
     [Fact]
-    public async Task GetLiveAlerts_ReturnsOk()
+    public async Task GetLiveAlerts_ReturnsOkWithData()
     {
-        var response = await _client.GetAsync("/api/v1/dashboard/live-alerts");
+        var response = await _client.GetAsync("/api/v1/live-alerts");
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+        var items = json.RootElement.GetProperty("data");
+        Assert.True(items.GetArrayLength() > 0);
+        Assert.Contains("alert-", items[0].GetProperty("id").GetString());
     }
 
     [Fact]
-    public async Task GetMacroMap_ReturnsOk()
+    public async Task GetMacroMap_ReturnsOkWithData()
     {
-        var response = await _client.GetAsync("/api/v1/dashboard/macro-map");
+        var response = await _client.GetAsync("/api/v1/macro-map");
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+        var items = json.RootElement.GetProperty("data");
+        Assert.True(items.GetArrayLength() > 0);
+        var categories = items.EnumerateArray().Select(x => x.GetProperty("category").GetString()).ToArray();
+        Assert.Contains("Semiconductors", categories);
     }
 }
