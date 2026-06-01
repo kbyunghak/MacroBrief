@@ -161,6 +161,7 @@ Step 5 is complete when:
 - Validation/regeneration/fallback flow fixed: In progress
   - validation + fallback implemented
   - multi-regeneration strategy implemented (max 2 attempts)
+  - failure-code audit tracking implemented
 - Example outputs approved: Pending
 - Unit/integration tests added for guardrail behavior and audit endpoint.
 
