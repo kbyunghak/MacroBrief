@@ -17,7 +17,10 @@ export function LiveAlertsClient({ initialItems }: Props) {
   const [polling, setPolling] = useState<boolean>(false);
 
   useEffect(() => {
-    const timer = setInterval(async () => {
+    let inFlight = false;
+    const tick = async () => {
+      if (document.visibilityState !== "visible" || inFlight) return;
+      inFlight = true;
       setPolling(true);
       try {
         const nextItems = await apiClient.getLiveAlerts(10);
@@ -27,10 +30,26 @@ export function LiveAlertsClient({ initialItems }: Props) {
         setStatus("Polling failed (showing last data)");
       } finally {
         setPolling(false);
+        inFlight = false;
       }
+    };
+
+    const timer = setInterval(() => {
+      void tick();
     }, pollMs);
 
-    return () => clearInterval(timer);
+    const onVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        void tick();
+      }
+    };
+
+    document.addEventListener("visibilitychange", onVisibilityChange);
+
+    return () => {
+      clearInterval(timer);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+    };
   }, []);
 
   return (
