@@ -11,6 +11,7 @@ if (app.Environment.IsDevelopment())
 
 app.MapDashboardEndpoints();
 app.MapHoldingEndpoints();
+app.MapPortfolioInsightsEndpoints();
 
 app.Run();
 
