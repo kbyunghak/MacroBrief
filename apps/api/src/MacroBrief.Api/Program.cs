@@ -15,6 +15,7 @@ builder.Services.AddSingleton<IMappingRulesProvider, JsonMappingRulesProvider>()
 builder.Services.AddSingleton<IAiExplanationService, InMemoryAiExplanationService>();
 builder.Services.AddSingleton<IPortfolioInsightsService, InMemoryPortfolioInsightsService>();
 builder.Services.AddSingleton<IFeedbackService, InMemoryFeedbackService>();
+builder.Services.AddSingleton<IKpiEventService, InMemoryKpiEventService>();
 
 var app = builder.Build();
 app.UseCors("WebClient");
@@ -29,6 +30,7 @@ app.MapHoldingEndpoints();
 app.MapPortfolioInsightsEndpoints();
 app.MapFeedbackEndpoints();
 app.MapAiGuardrailsEndpoints();
+app.MapKpiEventsEndpoints();
 
 app.Run();
 

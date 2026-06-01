@@ -5,7 +5,8 @@ import type {
   ImpactCard,
   LiveAlert,
   MacroMapItem,
-  RelevanceFeedbackRequest
+  RelevanceFeedbackRequest,
+  KpiEventRequest
 } from "../types/api";
 
 const API_BASE_URL = (process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:5000").replace(/\/+$/, "");
@@ -67,6 +68,12 @@ export const apiClient = {
   },
   submitRelevanceFeedback(input: RelevanceFeedbackRequest) {
     return request<{ accepted: boolean }>("/api/v1/feedback/relevance", {
+      method: "POST",
+      body: JSON.stringify(input)
+    });
+  },
+  submitKpiEvent(input: KpiEventRequest) {
+    return request<{ accepted: boolean }>("/api/v1/events", {
       method: "POST",
       body: JSON.stringify(input)
     });

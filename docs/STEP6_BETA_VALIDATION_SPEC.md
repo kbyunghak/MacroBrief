@@ -146,6 +146,19 @@ Feedback reason tags:
 - Generate weekly rollup using `beta_weekly_rollup.v1.json` field contract.
 - Start Week 1 baseline without rule changes.
 
+## 14. Current Implementation Snapshot (2026-06-01)
+
+- Shared event/rollup contracts added under `shared/contracts`.
+- Web KPI emitter scaffold implemented for:
+  - app_open
+  - dashboard_refresh
+  - holding_add
+  - holding_remove
+  - impact_feedback
+- API event ingestion scaffold implemented:
+  - `POST /api/v1/events`
+  - `GET /api/v1/internal/events` (development inspection)
+
 ---
 
 Version: v1

@@ -4,9 +4,11 @@ import { useMemo, useState } from "react";
 import { apiClient } from "../lib/api-client";
 import { formatSummaryUpdatedLabel } from "../lib/dashboard-format";
 import { buildRefreshNotice, getFailuresCount, normalizeHoldingsErrorMessage } from "../lib/dashboard-state";
+import { emitKpiEvent } from "../lib/kpi-events";
 import { ImpactCardsClient } from "./ImpactCardsClient";
 import { LiveAlertsClient } from "./LiveAlertsClient";
 import type { DashboardSummary, Holding, ImpactCard, LiveAlert, MacroMapItem } from "../types/api";
+import { useEffect } from "react";
 
 type Props = {
   initialSummary: DashboardSummary;
@@ -23,6 +25,9 @@ export function DashboardClient({
   initialLiveAlerts,
   initialMacroMap
 }: Props) {
+  useEffect(() => {
+    void emitKpiEvent("app_open");
+  }, []);
   const [summary, setSummary] = useState(initialSummary);
   const [holdings, setHoldings] = useState(initialHoldings);
   const [impactCards, setImpactCards] = useState(initialImpactCards);
@@ -110,6 +115,7 @@ export function DashboardClient({
     setRefreshNotice("");
     try {
       await refreshAll();
+      void emitKpiEvent("dashboard_refresh");
     } finally {
       setRefreshBusy(false);
       setRefreshCooldownSec(5);
@@ -134,6 +140,7 @@ export function DashboardClient({
     setInsightsBusy(true);
     try {
       await apiClient.addHolding(symbol);
+      void emitKpiEvent("holding_add", { symbol });
       setNewSymbol("");
       await refreshAll();
     } catch (error) {
@@ -151,6 +158,7 @@ export function DashboardClient({
     setInsightsBusy(true);
     try {
       await apiClient.deleteHolding(symbol);
+      void emitKpiEvent("holding_remove", { symbol });
       await refreshAll();
     } catch (error) {
       const message = error instanceof Error ? error.message : "Failed to remove holding.";

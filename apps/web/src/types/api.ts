@@ -51,3 +51,27 @@ export type RelevanceFeedbackRequest = {
   symbol: string;
   feedback: "relevant" | "not_relevant";
 };
+
+export type KpiEventType =
+  | "app_open"
+  | "dashboard_refresh"
+  | "holding_add"
+  | "holding_remove"
+  | "impact_feedback"
+  | "alert_view"
+  | "source_click";
+
+export type KpiEventRequest = {
+  eventId: string;
+  eventType: KpiEventType;
+  userId: string;
+  occurredAtUtc: string;
+  sessionId: string;
+  symbol?: string;
+  newsEventId?: string;
+  feedback?: string;
+  reasonTag?: string;
+  sourceName?: string;
+  sourceUrl?: string;
+  meta?: Record<string, string>;
+};

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { apiClient } from "../lib/api-client";
+import { emitKpiEvent } from "../lib/kpi-events";
 import type { ImpactCard } from "../types/api";
 
 type Props = {
@@ -18,6 +19,11 @@ export function ImpactCardsClient({ items }: Props) {
       await apiClient.submitRelevanceFeedback({
         newsEventId: `impact-${symbol.toLowerCase()}`,
         symbol,
+        feedback
+      });
+      void emitKpiEvent("impact_feedback", {
+        symbol,
+        newsEventId: `impact-${symbol.toLowerCase()}`,
         feedback
       });
       setMessageBySymbol((prev) => ({ ...prev, [symbol]: "Saved" }));
