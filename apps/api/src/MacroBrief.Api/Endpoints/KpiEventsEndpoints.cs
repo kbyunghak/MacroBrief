@@ -69,5 +69,62 @@ public static class KpiEventsEndpoints
 
             return Results.Ok(ApiResponse<KpiEventsSummary>.Ok(summary));
         });
+
+        app.MapGet("/api/v1/internal/events/weekly-rollup", (int? days, IKpiEventService service, IAiExplanationService aiExplanationService) =>
+        {
+            var windowDays = Math.Clamp(days ?? 7, 1, 30);
+            var fromUtc = DateTime.UtcNow.AddDays(-windowDays);
+            var events = service.GetRecent(5000).Where(x => x.OccurredAtUtc >= fromUtc).ToList();
+            var appOpenEvents = events.Where(x => x.EventType.Equals("app_open", StringComparison.OrdinalIgnoreCase)).ToList();
+            var impactFeedbackEvents = events.Where(x => x.EventType.Equals("impact_feedback", StringComparison.OrdinalIgnoreCase)).ToList();
+            var alertViewCount = events.Count(x => x.EventType.Equals("alert_view", StringComparison.OrdinalIgnoreCase));
+            var sourceClickCount = events.Count(x => x.EventType.Equals("source_click", StringComparison.OrdinalIgnoreCase));
+
+            var cohortSize = appOpenEvents.Select(x => x.UserId).Distinct(StringComparer.OrdinalIgnoreCase).Count();
+            var weeklyActiveUsers = events.Select(x => x.UserId).Distinct(StringComparer.OrdinalIgnoreCase).Count();
+
+            var positiveFeedback = impactFeedbackEvents.Count(x => x.Feedback == "relevant");
+            var negativeFeedback = impactFeedbackEvents.Count(x => x.Feedback == "not_relevant");
+            var totalFeedback = impactFeedbackEvents.Count;
+
+            var relevancePositiveRatio = totalFeedback == 0 ? 0 : (double)positiveFeedback / totalFeedback;
+            var falseRelevanceRate = totalFeedback == 0 ? 0 : (double)negativeFeedback / totalFeedback;
+            var alertCtr = appOpenEvents.Count == 0 ? 0 : (double)alertViewCount / appOpenEvents.Count;
+            var sourceClickRate = appOpenEvents.Count == 0 ? 0 : (double)sourceClickCount / appOpenEvents.Count;
+
+            var feedbackThemes = impactFeedbackEvents
+                .Where(x => !string.IsNullOrWhiteSpace(x.ReasonTag))
+                .GroupBy(x => x.ReasonTag!, StringComparer.OrdinalIgnoreCase)
+                .OrderByDescending(g => g.Count())
+                .ThenBy(g => g.Key)
+                .Take(5)
+                .Select(g => g.Key)
+                .ToList();
+
+            var aiLogs = aiExplanationService.GetAuditLogs()
+                .Where(x => x.CreatedAtUtc >= fromUtc)
+                .ToList();
+            var explanationPolicyViolationRate = aiLogs.Count == 0
+                ? 0
+                : (double)aiLogs.Count(x => x.ValidationFailureCodes.Count > 0) / aiLogs.Count;
+
+            var rollup = new BetaWeeklyRollup(
+                WeekStartDate: DateOnly.FromDateTime(fromUtc.Date),
+                CohortSize: cohortSize,
+                WeeklyActiveUsers: weeklyActiveUsers,
+                D7RetentionRate: 0, // Placeholder until stable cohort tracking is added.
+                RelevancePositiveRatio: Math.Round(relevancePositiveRatio, 3),
+                AlertClickThroughRate: Math.Round(alertCtr, 3),
+                SourceClickRate: Math.Round(sourceClickRate, 3),
+                ExplanationPolicyViolationRate: Math.Round(explanationPolicyViolationRate, 3),
+                FalseRelevanceRate: Math.Round(falseRelevanceRate, 3),
+                DuplicateAlertRate: 0,
+                MissingSourceRate: 0,
+                TopFeedbackThemes: feedbackThemes,
+                RuleVersion: "v1",
+                Notes: "D7RetentionRate is placeholder until cohort retention tracking is implemented.");
+
+            return Results.Ok(ApiResponse<BetaWeeklyRollup>.Ok(rollup));
+        });
     }
 }

@@ -54,4 +54,26 @@ public class KpiEventsEndpointsTests : IClassFixture<WebApplicationFactory<Progr
         var data = json.RootElement.GetProperty("data");
         Assert.True(data.GetProperty("totalEvents").GetInt32() > 0);
     }
+
+    [Fact]
+    public async Task GetWeeklyRollup_ReturnsKpiFields()
+    {
+        await _client.PostAsJsonAsync("/api/v1/events", new
+        {
+            eventId = "evt-test-3",
+            eventType = "impact_feedback",
+            userId = "usr-test",
+            occurredAtUtc = DateTime.UtcNow,
+            sessionId = "ses-test",
+            feedback = "relevant"
+        });
+
+        var response = await _client.GetAsync("/api/v1/internal/events/weekly-rollup?days=7");
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+        var data = json.RootElement.GetProperty("data");
+        Assert.True(data.GetProperty("weeklyActiveUsers").GetInt32() >= 1);
+        Assert.True(data.GetProperty("relevancePositiveRatio").GetDouble() >= 0);
+    }
 }

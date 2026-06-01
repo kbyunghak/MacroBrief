@@ -1,0 +1,15 @@
+public record BetaWeeklyRollup(
+    DateOnly WeekStartDate,
+    int CohortSize,
+    int WeeklyActiveUsers,
+    double D7RetentionRate,
+    double RelevancePositiveRatio,
+    double AlertClickThroughRate,
+    double SourceClickRate,
+    double ExplanationPolicyViolationRate,
+    double FalseRelevanceRate,
+    double DuplicateAlertRate,
+    double MissingSourceRate,
+    IReadOnlyList<string> TopFeedbackThemes,
+    string RuleVersion,
+    string? Notes);
