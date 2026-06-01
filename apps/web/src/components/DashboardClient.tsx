@@ -33,6 +33,7 @@ export function DashboardClient({
   const [holdingsError, setHoldingsError] = useState("");
   const [summaryError, setSummaryError] = useState("");
   const [insightsError, setInsightsError] = useState("");
+  const [refreshBusy, setRefreshBusy] = useState(false);
 
   const pollingKey = useMemo(() => holdings.map((h) => h.symbol).join(","), [holdings]);
   const normalizedSymbol = newSymbol.trim().toUpperCase();
@@ -96,6 +97,15 @@ export function DashboardClient({
     }
   }
 
+  async function onManualRefresh() {
+    setRefreshBusy(true);
+    try {
+      await refreshAll();
+    } finally {
+      setRefreshBusy(false);
+    }
+  }
+
   async function onAddHolding() {
     const symbol = normalizedSymbol;
     if (!symbol) return;
@@ -136,6 +146,11 @@ export function DashboardClient({
     <main>
       <h1>MacroBrief Dashboard</h1>
       <p>Last updated: {lastUpdatedLabel}</p>
+      <p>
+        <button onClick={() => void onManualRefresh()} disabled={refreshBusy || holdingsBusy || insightsBusy}>
+          {refreshBusy ? "Refreshing..." : "Refresh"}
+        </button>
+      </p>
 
       <section>
         <h2>Summary</h2>
