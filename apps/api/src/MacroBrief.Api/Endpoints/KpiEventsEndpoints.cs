@@ -92,6 +92,19 @@ public static class KpiEventsEndpoints
             var alertCtr = appOpenEvents.Count == 0 ? 0 : (double)alertViewCount / appOpenEvents.Count;
             var sourceClickRate = appOpenEvents.Count == 0 ? 0 : (double)sourceClickCount / appOpenEvents.Count;
 
+            var appOpenByUser = appOpenEvents
+                .GroupBy(x => x.UserId, StringComparer.OrdinalIgnoreCase)
+                .Select(g => new
+                {
+                    UserId = g.Key,
+                    FirstSeen = g.Min(x => x.OccurredAtUtc),
+                    LastSeen = g.Max(x => x.OccurredAtUtc)
+                })
+                .ToList();
+            var d7Eligible = appOpenByUser.Count(x => x.FirstSeen <= DateTime.UtcNow.AddDays(-7));
+            var d7Retained = appOpenByUser.Count(x => x.LastSeen >= x.FirstSeen.AddDays(7));
+            var d7RetentionRate = d7Eligible == 0 ? 0 : (double)d7Retained / d7Eligible;
+
             var feedbackThemes = impactFeedbackEvents
                 .Where(x => !string.IsNullOrWhiteSpace(x.ReasonTag))
                 .GroupBy(x => x.ReasonTag!, StringComparer.OrdinalIgnoreCase)
@@ -112,7 +125,7 @@ public static class KpiEventsEndpoints
                 WeekStartDate: DateOnly.FromDateTime(fromUtc.Date),
                 CohortSize: cohortSize,
                 WeeklyActiveUsers: weeklyActiveUsers,
-                D7RetentionRate: 0, // Placeholder until stable cohort tracking is added.
+                D7RetentionRate: Math.Round(d7RetentionRate, 3),
                 RelevancePositiveRatio: Math.Round(relevancePositiveRatio, 3),
                 AlertClickThroughRate: Math.Round(alertCtr, 3),
                 SourceClickRate: Math.Round(sourceClickRate, 3),
@@ -122,7 +135,7 @@ public static class KpiEventsEndpoints
                 MissingSourceRate: 0,
                 TopFeedbackThemes: feedbackThemes,
                 RuleVersion: "v1",
-                Notes: "D7RetentionRate is placeholder until cohort retention tracking is implemented.");
+                Notes: "D7RetentionRate is estimated from app_open first/last seen timestamps in the selected window.");
 
             return Results.Ok(ApiResponse<BetaWeeklyRollup>.Ok(rollup));
         });
