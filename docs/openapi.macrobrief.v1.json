@@ -1,0 +1,52 @@
+﻿{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "MacroBrief MVP API",
+    "version": "v1"
+  },
+  "paths": {
+    "/api/v1/dashboard/summary": {
+      "get": {
+        "summary": "Dashboard summary",
+        "responses": {"200": {"description": "OK"}}
+      }
+    },
+    "/api/v1/holdings": {
+      "get": {"summary": "List holdings", "responses": {"200": {"description": "OK"}}},
+      "post": {"summary": "Add holding", "responses": {"201": {"description": "Created"}}}
+    },
+    "/api/v1/holdings/{symbol}": {
+      "delete": {
+        "summary": "Remove holding",
+        "parameters": [{"name": "symbol", "in": "path", "required": true, "schema": {"type": "string"}}],
+        "responses": {"204": {"description": "No Content"}}
+      }
+    },
+    "/api/v1/impact-cards": {
+      "get": {
+        "summary": "Get impact cards",
+        "parameters": [{"name": "symbols", "in": "query", "schema": {"type": "string"}}],
+        "responses": {"200": {"description": "OK"}}
+      }
+    },
+    "/api/v1/live-alerts": {
+      "get": {
+        "summary": "Get live alerts",
+        "parameters": [{"name": "limit", "in": "query", "schema": {"type": "integer", "default": 20}}],
+        "responses": {"200": {"description": "OK"}}
+      }
+    },
+    "/api/v1/macro-map": {
+      "get": {
+        "summary": "Get macro map",
+        "responses": {"200": {"description": "OK"}}
+      }
+    },
+    "/api/v1/feedback/relevance": {
+      "post": {
+        "summary": "Submit relevance feedback",
+        "responses": {"201": {"description": "Created"}}
+      }
+    }
+  }
+}
