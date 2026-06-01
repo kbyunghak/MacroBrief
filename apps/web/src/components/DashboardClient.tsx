@@ -31,12 +31,14 @@ export function DashboardClient({
   const [holdingsBusy, setHoldingsBusy] = useState(false);
   const [insightsBusy, setInsightsBusy] = useState(false);
   const [holdingsError, setHoldingsError] = useState("");
+  const [summaryError, setSummaryError] = useState("");
+  const [insightsError, setInsightsError] = useState("");
 
   const pollingKey = useMemo(() => holdings.map((h) => h.symbol).join(","), [holdings]);
   const lastUpdatedLabel = new Date(summary.lastUpdatedAt).toISOString().replace("T", " ").replace("Z", " UTC");
 
   async function refreshAll() {
-    const [nextSummary, nextHoldings, nextImpactCards, nextLiveAlerts, nextMacroMap] = await Promise.all([
+    const [nextSummary, nextHoldings, nextImpactCards, nextLiveAlerts, nextMacroMap] = await Promise.allSettled([
       apiClient.getDashboardSummary(),
       apiClient.getHoldings(),
       apiClient.getImpactCards(),
@@ -44,11 +46,45 @@ export function DashboardClient({
       apiClient.getMacroMap()
     ]);
 
-    setSummary(nextSummary);
-    setHoldings(nextHoldings);
-    setImpactCards(nextImpactCards);
-    setLiveAlerts(nextLiveAlerts);
-    setMacroMap(nextMacroMap);
+    if (nextSummary.status === "fulfilled") {
+      setSummary(nextSummary.value);
+      setSummaryError("");
+    } else {
+      setSummaryError("Summary refresh failed. Showing last data.");
+    }
+
+    if (nextHoldings.status === "fulfilled") {
+      setHoldings(nextHoldings.value);
+      setHoldingsError("");
+    } else {
+      setHoldingsError("Holdings refresh failed. Showing last data.");
+    }
+
+    const insightsFailures: string[] = [];
+
+    if (nextImpactCards.status === "fulfilled") {
+      setImpactCards(nextImpactCards.value);
+    } else {
+      insightsFailures.push("impact cards");
+    }
+
+    if (nextLiveAlerts.status === "fulfilled") {
+      setLiveAlerts(nextLiveAlerts.value);
+    } else {
+      insightsFailures.push("live alerts");
+    }
+
+    if (nextMacroMap.status === "fulfilled") {
+      setMacroMap(nextMacroMap.value);
+    } else {
+      insightsFailures.push("macro map");
+    }
+
+    if (insightsFailures.length > 0) {
+      setInsightsError(`Failed to refresh ${insightsFailures.join(", ")}. Showing last data.`);
+    } else {
+      setInsightsError("");
+    }
   }
 
   async function onAddHolding() {
@@ -92,6 +128,7 @@ export function DashboardClient({
 
       <section>
         <h2>Summary</h2>
+        {summaryError ? <p className="error">{summaryError}</p> : null}
         <p>Holdings: {summary.holdingsCount}</p>
         <p>Related updates: {summary.relatedUpdatesCount}</p>
         <ul>
@@ -147,12 +184,14 @@ export function DashboardClient({
         <section>
           <h2>Impact Cards</h2>
           {insightsBusy ? <p>Refreshing impact data...</p> : null}
+          {insightsError ? <p className="error">{insightsError}</p> : null}
           <ImpactCardsClient items={impactCards} />
         </section>
 
         <section>
           <h2>Live Alerts</h2>
           {insightsBusy ? <p>Refreshing alerts...</p> : null}
+          {insightsError ? <p className="error">{insightsError}</p> : null}
           <LiveAlertsClient key={pollingKey} initialItems={liveAlerts} />
         </section>
       </div>
@@ -160,6 +199,7 @@ export function DashboardClient({
       <section>
         <h2>Macro Map</h2>
         {insightsBusy ? <p>Refreshing macro map...</p> : null}
+        {insightsError ? <p className="error">{insightsError}</p> : null}
         <ul>
           {macroMap.map((item) => (
             <li key={item.category}>
