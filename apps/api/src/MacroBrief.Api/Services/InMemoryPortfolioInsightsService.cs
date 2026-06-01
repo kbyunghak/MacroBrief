@@ -1,10 +1,12 @@
 public class InMemoryPortfolioInsightsService : IPortfolioInsightsService
 {
     private readonly IMappingRulesProvider _mappingRulesProvider;
+    private readonly IAiExplanationService _aiExplanationService;
 
-    public InMemoryPortfolioInsightsService(IMappingRulesProvider mappingRulesProvider)
+    public InMemoryPortfolioInsightsService(IMappingRulesProvider mappingRulesProvider, IAiExplanationService aiExplanationService)
     {
         _mappingRulesProvider = mappingRulesProvider;
+        _aiExplanationService = aiExplanationService;
     }
 
     public IReadOnlyList<ImpactCard> GetImpactCards(IReadOnlyList<Holding> holdings, IReadOnlyList<string>? symbols = null)
@@ -44,13 +46,19 @@ public class InMemoryPortfolioInsightsService : IPortfolioInsightsService
 
     private ImpactCard BuildImpactCard(string symbol)
     {
-        return GetCategory(symbol) switch
+        var category = GetCategory(symbol);
+        var (headline, impactLevel, macroFactor, exposurePath, score) = category switch
         {
-            "Semiconductors" => new ImpactCard(symbol, "US chip policy headline flow increased", "high", "Policy headlines can quickly change demand and export expectations."),
-            "Energy" => new ImpactCard(symbol, "Crude oil moved higher intraday", "medium", "Energy price direction may affect earnings sensitivity."),
-            "Interest Rates" => new ImpactCard(symbol, "Treasury yields showed intraday volatility", "medium", "Rate expectations can influence funding and valuation assumptions."),
-            _ => new ImpactCard(symbol, "Macro headlines remain mixed", "low", "Broader macro shifts may still impact risk sentiment.")
+            "Semiconductors" => ("US chip policy headline flow increased", "high", "ai_semiconductors", "semiconductor demand expectations", 6),
+            "Energy" => ("Crude oil moved higher intraday", "medium", "oil_energy", "energy price volatility", 5),
+            "Interest Rates" => ("Treasury yields showed intraday volatility", "medium", "interest_rates", "funding and valuation assumptions", 5),
+            _ => ("Macro headlines remain mixed", "low", "broad_macro", "overall risk sentiment", 3)
         };
+
+        var candidate = $"This update may be relevant because changes in {macroFactor} can influence {symbol} through {exposurePath}.";
+        var reason = _aiExplanationService.BuildGuardedExplanation(symbol, macroFactor, exposurePath, candidate, score);
+
+        return new ImpactCard(symbol, headline, impactLevel, reason);
     }
 
     private LiveAlert BuildLiveAlert(string symbol, int index, DateTime now)

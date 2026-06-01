@@ -12,6 +12,7 @@ builder.Services.AddCors(options =>
 });
 builder.Services.AddSingleton<IHoldingsService, InMemoryHoldingsService>();
 builder.Services.AddSingleton<IMappingRulesProvider, JsonMappingRulesProvider>();
+builder.Services.AddSingleton<IAiExplanationService, InMemoryAiExplanationService>();
 builder.Services.AddSingleton<IPortfolioInsightsService, InMemoryPortfolioInsightsService>();
 builder.Services.AddSingleton<IFeedbackService, InMemoryFeedbackService>();
 

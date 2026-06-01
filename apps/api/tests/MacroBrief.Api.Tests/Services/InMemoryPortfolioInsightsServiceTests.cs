@@ -10,7 +10,7 @@ public class InMemoryPortfolioInsightsServiceTests
     [Fact]
     public void GetImpactCards_ReturnsPerHoldingCards()
     {
-        var service = new InMemoryPortfolioInsightsService(new StubMappingRulesProvider());
+        var service = new InMemoryPortfolioInsightsService(new StubMappingRulesProvider(), new StubAiExplanationService());
 
         var cards = service.GetImpactCards(SeedHoldings);
 
@@ -22,7 +22,7 @@ public class InMemoryPortfolioInsightsServiceTests
     [Fact]
     public void GetLiveAlerts_ReturnsStableAlertShape()
     {
-        var service = new InMemoryPortfolioInsightsService(new StubMappingRulesProvider());
+        var service = new InMemoryPortfolioInsightsService(new StubMappingRulesProvider(), new StubAiExplanationService());
 
         var alerts = service.GetLiveAlerts(SeedHoldings);
 
@@ -34,7 +34,7 @@ public class InMemoryPortfolioInsightsServiceTests
     [Fact]
     public void GetLiveAlerts_AppliesLimit()
     {
-        var service = new InMemoryPortfolioInsightsService(new StubMappingRulesProvider());
+        var service = new InMemoryPortfolioInsightsService(new StubMappingRulesProvider(), new StubAiExplanationService());
 
         var alerts = service.GetLiveAlerts(SeedHoldings, limit: 2);
 
@@ -44,7 +44,7 @@ public class InMemoryPortfolioInsightsServiceTests
     [Fact]
     public void GetMacroMap_GroupsByCategory()
     {
-        var service = new InMemoryPortfolioInsightsService(new StubMappingRulesProvider());
+        var service = new InMemoryPortfolioInsightsService(new StubMappingRulesProvider(), new StubAiExplanationService());
 
         var map = service.GetMacroMap(SeedHoldings);
 
@@ -56,7 +56,7 @@ public class InMemoryPortfolioInsightsServiceTests
     [Fact]
     public void GetImpactCards_FiltersSymbolsWhenProvided()
     {
-        var service = new InMemoryPortfolioInsightsService(new StubMappingRulesProvider());
+        var service = new InMemoryPortfolioInsightsService(new StubMappingRulesProvider(), new StubAiExplanationService());
 
         var cards = service.GetImpactCards(SeedHoldings, ["NVDA"]);
 
@@ -67,5 +67,13 @@ public class InMemoryPortfolioInsightsServiceTests
     private sealed class StubMappingRulesProvider : IMappingRulesProvider
     {
         public IReadOnlyList<string> GetExposureTags(string symbol) => [];
+    }
+
+    private sealed class StubAiExplanationService : IAiExplanationService
+    {
+        public string BuildGuardedExplanation(string symbol, string macroFactor, string exposurePath, string candidateText, int score)
+            => candidateText;
+
+        public IReadOnlyList<AiExplanationAuditItem> GetAuditLogs() => [];
     }
 }
