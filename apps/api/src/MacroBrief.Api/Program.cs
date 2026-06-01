@@ -1,4 +1,4 @@
-var builder = WebApplication.CreateBuilder(args);
+﻿var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
 builder.Services.AddSingleton<IHoldingsService, InMemoryHoldingsService>();
 
@@ -13,3 +13,5 @@ app.MapDashboardEndpoints();
 app.MapHoldingEndpoints();
 
 app.Run();
+
+public partial class Program;
