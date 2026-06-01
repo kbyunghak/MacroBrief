@@ -1,0 +1,25 @@
+﻿{
+  "version": "v1",
+  "max_length_chars": 220,
+  "required_phrase": "may be relevant because",
+  "banned_patterns": [
+    "buy",
+    "sell",
+    "hold recommendation",
+    "price target",
+    "will go up",
+    "will go down",
+    "bullish signal",
+    "bearish signal",
+    "guaranteed"
+  ],
+  "fallback_templates": [
+    "This update may be relevant to {symbol} because changes in {macro_factor} can affect {exposure_path}.",
+    "This event may matter for {symbol} due to potential impact on {exposure_path}, based on current macro conditions."
+  ],
+  "confidence_rules": {
+    "high": "score >= 6 and strong keyword match",
+    "medium": "score 4-5 with sufficient keyword support",
+    "low": "score 3-4 with limited contextual support"
+  }
+}
