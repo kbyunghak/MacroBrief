@@ -158,6 +158,7 @@ Feedback reason tags:
 - API event ingestion scaffold implemented:
   - `POST /api/v1/events`
   - `GET /api/v1/internal/events` (development inspection)
+  - `GET /api/v1/internal/events/summary` (quick KPI sanity check)
 
 ---
 

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { apiClient } from "../lib/api-client";
 import { formatTimeHms } from "../lib/dashboard-format";
+import { emitKpiEvent } from "../lib/kpi-events";
 import type { LiveAlert } from "../types/api";
 
 type Props = {
@@ -53,6 +54,16 @@ export function LiveAlertsClient({ initialItems }: Props) {
     };
   }, []);
 
+  function onAlertClick(alert: LiveAlert) {
+    void emitKpiEvent("alert_view", {
+      newsEventId: alert.id,
+      meta: {
+        category: alert.category,
+        severity: alert.severity
+      }
+    });
+  }
+
   return (
     <>
       <p>
@@ -63,7 +74,7 @@ export function LiveAlertsClient({ initialItems }: Props) {
       ) : (
         <ul>
           {items.map((alert) => (
-            <li key={alert.id}>
+            <li key={alert.id} onClick={() => onAlertClick(alert)} style={{ cursor: "pointer" }}>
               {alert.category} / {alert.severity}: {alert.message}
             </li>
           ))}

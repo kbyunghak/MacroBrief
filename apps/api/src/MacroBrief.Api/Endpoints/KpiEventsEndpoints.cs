@@ -52,5 +52,22 @@ public static class KpiEventsEndpoints
             var items = service.GetRecent(limit ?? 100);
             return Results.Ok(ApiResponse<IEnumerable<KpiEventItem>>.Ok(items));
         });
+
+        app.MapGet("/api/v1/internal/events/summary", (int? window, IKpiEventService service) =>
+        {
+            var take = Math.Clamp(window ?? 200, 1, 1000);
+            var items = service.GetRecent(take);
+            var counts = items
+                .GroupBy(x => x.EventType, StringComparer.OrdinalIgnoreCase)
+                .OrderByDescending(g => g.Count())
+                .ToDictionary(g => g.Key, g => g.Count(), StringComparer.OrdinalIgnoreCase);
+
+            var summary = new KpiEventsSummary(
+                TotalEvents: items.Count,
+                EventTypeCounts: counts,
+                LatestOccurredAtUtc: items.Count == 0 ? null : items.Max(x => x.OccurredAtUtc));
+
+            return Results.Ok(ApiResponse<KpiEventsSummary>.Ok(summary));
+        });
     }
 }

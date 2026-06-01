@@ -34,4 +34,24 @@ public class KpiEventsEndpointsTests : IClassFixture<WebApplicationFactory<Progr
         Assert.True(items.GetArrayLength() > 0);
         Assert.Equal("evt-test-1", items[0].GetProperty("eventId").GetString());
     }
+
+    [Fact]
+    public async Task GetEventsSummary_ReturnsCounts()
+    {
+        await _client.PostAsJsonAsync("/api/v1/events", new
+        {
+            eventId = "evt-test-2",
+            eventType = "holding_add",
+            userId = "usr-test",
+            occurredAtUtc = DateTime.UtcNow,
+            sessionId = "ses-test"
+        });
+
+        var response = await _client.GetAsync("/api/v1/internal/events/summary?window=50");
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+        var data = json.RootElement.GetProperty("data");
+        Assert.True(data.GetProperty("totalEvents").GetInt32() > 0);
+    }
 }
