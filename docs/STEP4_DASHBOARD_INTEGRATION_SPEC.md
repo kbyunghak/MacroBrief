@@ -108,6 +108,23 @@ Step 4 is complete when:
 - Partial failure handling implemented with previous-data retention
 - Web unit test entry added for dashboard formatting utilities (`vitest`)
 
+## 10. Step 4 Exit Readiness (2026-06-01)
+
+Status: Ready
+
+- Section-to-API wiring is complete for all MVP dashboard sections.
+- Section-level loading/empty/error handling is in place.
+- Live alerts polling behavior is implemented, including hidden-tab pause and focus refresh.
+- Manual refresh behavior is implemented with partial-failure notice and cooldown.
+- Feedback action path is wired from UI to API.
+- Web unit test scaffold is active and passing (`npm test`).
+
+## 11. Step 5 Entry Checklist
+
+- Keep non-advisory tone and guardrail language consistent in all generated/explained text.
+- Introduce explanation validation/fallback pipeline in API before production-facing AI output.
+- Add audit-friendly logging fields for explanation generation and fallback reasons.
+
 ---
 
 Version: v1
