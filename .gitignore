@@ -1,6 +1,30 @@
-bin/
-obj/
-.dotnet/
+# OS / Editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
 .vs/
 *.user
 *.suo
+
+# .NET
+bin/
+obj/
+.dotnet/
+
+# Node / Next.js
+node_modules/
+.next/
+out/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Env files
+.env.local
+.env.*.local
+
+# Test / coverage artifacts
+coverage/
+TestResults/

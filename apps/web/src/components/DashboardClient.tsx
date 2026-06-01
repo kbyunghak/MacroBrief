@@ -33,6 +33,7 @@ export function DashboardClient({
   const [holdingsError, setHoldingsError] = useState("");
 
   const pollingKey = useMemo(() => holdings.map((h) => h.symbol).join(","), [holdings]);
+  const lastUpdatedLabel = new Date(summary.lastUpdatedAt).toISOString().replace("T", " ").replace("Z", " UTC");
 
   async function refreshAll() {
     const [nextSummary, nextHoldings, nextImpactCards, nextLiveAlerts, nextMacroMap] = await Promise.all([
@@ -87,7 +88,7 @@ export function DashboardClient({
   return (
     <main>
       <h1>MacroBrief Dashboard</h1>
-      <p>Last updated: {new Date(summary.lastUpdatedAt).toLocaleString()}</p>
+      <p>Last updated: {lastUpdatedLabel}</p>
 
       <section>
         <h2>Summary</h2>
