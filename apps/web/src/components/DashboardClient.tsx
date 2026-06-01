@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useMemo, useState } from "react";
 import { apiClient } from "../lib/api-client";
@@ -40,9 +40,9 @@ export function DashboardClient({
   const lastUpdatedLabel = new Date(summary.lastUpdatedAt).toISOString().replace("T", " ").replace("Z", " UTC");
 
   function normalizeHoldingsErrorMessage(raw: string) {
-    if (raw.includes("duplicate_symbol")) return "이미 등록된 종목입니다.";
-    if (raw.includes("invalid_symbol")) return "심볼 형식이 올바르지 않습니다.";
-    if (raw.includes("request_failed")) return "요청 처리에 실패했습니다. 잠시 후 다시 시도해 주세요.";
+    if (raw.includes("duplicate_symbol")) return "This symbol is already in your holdings.";
+    if (raw.includes("invalid_symbol")) return "Symbol format is invalid.";
+    if (raw.includes("request_failed")) return "Request failed. Please try again shortly.";
     return raw;
   }
 
@@ -200,18 +200,18 @@ export function DashboardClient({
         </section>
       </div>
 
+      {insightsError ? <p className="error">{insightsError}</p> : null}
+
       <div className="grid two">
         <section>
           <h2>Impact Cards</h2>
           {insightsBusy ? <p>Refreshing impact data...</p> : null}
-          {insightsError ? <p className="error">{insightsError}</p> : null}
           <ImpactCardsClient items={impactCards} />
         </section>
 
         <section>
           <h2>Live Alerts</h2>
           {insightsBusy ? <p>Refreshing alerts...</p> : null}
-          {insightsError ? <p className="error">{insightsError}</p> : null}
           <LiveAlertsClient key={pollingKey} initialItems={liveAlerts} />
         </section>
       </div>
@@ -219,7 +219,6 @@ export function DashboardClient({
       <section>
         <h2>Macro Map</h2>
         {insightsBusy ? <p>Refreshing macro map...</p> : null}
-        {insightsError ? <p className="error">{insightsError}</p> : null}
         <ul>
           {macroMap.map((item) => (
             <li key={item.category}>
