@@ -154,7 +154,7 @@ Step 5 is complete when:
   - includes `fallback_rate`, `fallback_rate_level`, and `fallback_rate_warning` for monitoring
   - includes top validation failure codes for triage
 
-## 14. Approved Output Snapshot (2026-06-01)
+## 13. Approved Output Snapshot (2026-06-01)
 
 Approved reference style for current scaffold:
 - "This update may be relevant because changes in ai_semiconductors can influence NVDA through semiconductor demand expectations."
@@ -165,16 +165,18 @@ Approval note:
 - These examples are informational, conditional, and non-advisory.
 - They satisfy required phrase and banned-language constraints in current guardrail config.
 
-## 13. Step 5 Exit Progress (2026-06-01)
+## 14. Step 5 Exit Progress (2026-06-01)
 
 - Prompt policy fixed: Done
 - Banned language list fixed: Done
-- Validation/regeneration/fallback flow fixed: In progress
+- Validation/regeneration/fallback flow fixed: Done
   - validation + fallback implemented
   - multi-regeneration strategy implemented (max 2 attempts)
   - failure-code audit tracking implemented
 - Example outputs approved: Done (scaffold snapshot)
 - Unit/integration tests added for guardrail behavior and audit endpoint.
+
+Status: Ready
 
 ---
 

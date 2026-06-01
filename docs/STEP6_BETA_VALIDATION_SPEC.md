@@ -113,6 +113,13 @@ Step 6 is complete when:
 - Decision gates are agreed
 - 4-week execution cadence is defined
 
+## 11. Step 6 Entry Checklist (2026-06-01)
+
+- Step 4 dashboard integration readiness: complete
+- Step 5 AI guardrail readiness: complete
+- Relevance feedback endpoint and UI action path: available
+- Internal AI audit/summary endpoints for quality monitoring: available
+
 ---
 
 Version: v1
