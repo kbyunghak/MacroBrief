@@ -10,7 +10,7 @@ public class InMemoryPortfolioInsightsServiceTests
     [Fact]
     public void GetImpactCards_ReturnsPerHoldingCards()
     {
-        var service = new InMemoryPortfolioInsightsService();
+        var service = new InMemoryPortfolioInsightsService(new StubMappingRulesProvider());
 
         var cards = service.GetImpactCards(SeedHoldings);
 
@@ -22,7 +22,7 @@ public class InMemoryPortfolioInsightsServiceTests
     [Fact]
     public void GetLiveAlerts_ReturnsStableAlertShape()
     {
-        var service = new InMemoryPortfolioInsightsService();
+        var service = new InMemoryPortfolioInsightsService(new StubMappingRulesProvider());
 
         var alerts = service.GetLiveAlerts(SeedHoldings);
 
@@ -32,14 +32,40 @@ public class InMemoryPortfolioInsightsServiceTests
     }
 
     [Fact]
+    public void GetLiveAlerts_AppliesLimit()
+    {
+        var service = new InMemoryPortfolioInsightsService(new StubMappingRulesProvider());
+
+        var alerts = service.GetLiveAlerts(SeedHoldings, limit: 2);
+
+        Assert.Equal(2, alerts.Count);
+    }
+
+    [Fact]
     public void GetMacroMap_GroupsByCategory()
     {
-        var service = new InMemoryPortfolioInsightsService();
+        var service = new InMemoryPortfolioInsightsService(new StubMappingRulesProvider());
 
         var map = service.GetMacroMap(SeedHoldings);
 
         Assert.Contains(map, m => m.Category == "Semiconductors" && m.RelatedHoldingsCount == 1);
         Assert.Contains(map, m => m.Category == "Energy" && m.RelatedHoldingsCount == 1);
         Assert.Contains(map, m => m.Category == "Interest Rates" && m.RelatedHoldingsCount == 1);
+    }
+
+    [Fact]
+    public void GetImpactCards_FiltersSymbolsWhenProvided()
+    {
+        var service = new InMemoryPortfolioInsightsService(new StubMappingRulesProvider());
+
+        var cards = service.GetImpactCards(SeedHoldings, ["NVDA"]);
+
+        Assert.Single(cards);
+        Assert.Equal("NVDA", cards[0].Symbol);
+    }
+
+    private sealed class StubMappingRulesProvider : IMappingRulesProvider
+    {
+        public IReadOnlyList<string> GetExposureTags(string symbol) => [];
     }
 }

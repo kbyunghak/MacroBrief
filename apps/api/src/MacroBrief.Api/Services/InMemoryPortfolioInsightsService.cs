@@ -1,18 +1,30 @@
 public class InMemoryPortfolioInsightsService : IPortfolioInsightsService
 {
-    public IReadOnlyList<ImpactCard> GetImpactCards(IReadOnlyList<Holding> holdings)
+    private readonly IMappingRulesProvider _mappingRulesProvider;
+
+    public InMemoryPortfolioInsightsService(IMappingRulesProvider mappingRulesProvider)
     {
-        return holdings
+        _mappingRulesProvider = mappingRulesProvider;
+    }
+
+    public IReadOnlyList<ImpactCard> GetImpactCards(IReadOnlyList<Holding> holdings, IReadOnlyList<string>? symbols = null)
+    {
+        var filtered = symbols is { Count: > 0 }
+            ? holdings.Where(h => symbols.Contains(h.Symbol, StringComparer.OrdinalIgnoreCase)).ToList()
+            : holdings.ToList();
+
+        return filtered
             .Take(5)
-            .Select(BuildImpactCard)
+            .Select(h => BuildImpactCard(h.Symbol))
             .ToList();
     }
 
-    public IReadOnlyList<LiveAlert> GetLiveAlerts(IReadOnlyList<Holding> holdings)
+    public IReadOnlyList<LiveAlert> GetLiveAlerts(IReadOnlyList<Holding> holdings, int limit = 20)
     {
+        var sanitizedLimit = Math.Clamp(limit, 1, 100);
         var now = DateTime.UtcNow;
         return holdings
-            .Take(5)
+            .Take(sanitizedLimit)
             .Select((h, i) => BuildLiveAlert(h.Symbol, i, now))
             .ToList();
     }
@@ -30,18 +42,18 @@ public class InMemoryPortfolioInsightsService : IPortfolioInsightsService
         return categoryCounts;
     }
 
-    private static ImpactCard BuildImpactCard(Holding holding)
+    private ImpactCard BuildImpactCard(string symbol)
     {
-        return GetCategory(holding.Symbol) switch
+        return GetCategory(symbol) switch
         {
-            "Semiconductors" => new ImpactCard(holding.Symbol, "US chip policy headline flow increased", "high", "Policy headlines can quickly change demand and export expectations."),
-            "Energy" => new ImpactCard(holding.Symbol, "Crude oil moved higher intraday", "medium", "Energy price direction may affect earnings sensitivity."),
-            "Interest Rates" => new ImpactCard(holding.Symbol, "Treasury yields showed intraday volatility", "medium", "Rate expectations can influence funding and valuation assumptions."),
-            _ => new ImpactCard(holding.Symbol, "Macro headlines remain mixed", "low", "Broader macro shifts may still impact risk sentiment.")
+            "Semiconductors" => new ImpactCard(symbol, "US chip policy headline flow increased", "high", "Policy headlines can quickly change demand and export expectations."),
+            "Energy" => new ImpactCard(symbol, "Crude oil moved higher intraday", "medium", "Energy price direction may affect earnings sensitivity."),
+            "Interest Rates" => new ImpactCard(symbol, "Treasury yields showed intraday volatility", "medium", "Rate expectations can influence funding and valuation assumptions."),
+            _ => new ImpactCard(symbol, "Macro headlines remain mixed", "low", "Broader macro shifts may still impact risk sentiment.")
         };
     }
 
-    private static LiveAlert BuildLiveAlert(string symbol, int index, DateTime now)
+    private LiveAlert BuildLiveAlert(string symbol, int index, DateTime now)
     {
         var category = GetCategory(symbol);
         return new LiveAlert(
@@ -52,8 +64,28 @@ public class InMemoryPortfolioInsightsService : IPortfolioInsightsService
             $"{symbol}: {category} event relevance updated.");
     }
 
-    private static string GetCategory(string symbol)
+    private string GetCategory(string symbol)
     {
+        return GetCategory(symbol, _mappingRulesProvider.GetExposureTags(symbol));
+    }
+
+    private static string GetCategory(string symbol, IReadOnlyList<string> tags)
+    {
+        if (tags.Any(t => t.Contains("ai_semiconductors", StringComparison.OrdinalIgnoreCase)))
+        {
+            return "Semiconductors";
+        }
+
+        if (tags.Any(t => t.Contains("oil_energy", StringComparison.OrdinalIgnoreCase) || t.Contains("opec", StringComparison.OrdinalIgnoreCase)))
+        {
+            return "Energy";
+        }
+
+        if (tags.Any(t => t.Contains("interest_rates", StringComparison.OrdinalIgnoreCase) || t.Contains("consumer_credit", StringComparison.OrdinalIgnoreCase)))
+        {
+            return "Interest Rates";
+        }
+
         return symbol switch
         {
             "NVDA" or "AMD" or "TSM" => "Semiconductors",

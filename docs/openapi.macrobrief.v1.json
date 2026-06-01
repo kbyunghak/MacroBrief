@@ -45,7 +45,26 @@
     "/api/v1/feedback/relevance": {
       "post": {
         "summary": "Submit relevance feedback",
-        "responses": {"201": {"description": "Created"}}
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["newsEventId", "symbol", "feedback"],
+                "properties": {
+                  "newsEventId": {"type": "string"},
+                  "symbol": {"type": "string"},
+                  "feedback": {"type": "string", "enum": ["relevant", "not_relevant"]}
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {"description": "Created"},
+          "400": {"description": "Bad Request"}
+        }
       }
     }
   }

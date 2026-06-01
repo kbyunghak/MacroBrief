@@ -24,6 +24,18 @@ public class PortfolioInsightsEndpointsTests : IClassFixture<WebApplicationFacto
     }
 
     [Fact]
+    public async Task GetImpactCards_WithSymbolsFilter_ReturnsOnlyRequestedSymbols()
+    {
+        var response = await _client.GetAsync("/api/v1/impact-cards?symbols=NVDA");
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+        var items = json.RootElement.GetProperty("data");
+        Assert.Equal(1, items.GetArrayLength());
+        Assert.Equal("NVDA", items[0].GetProperty("symbol").GetString());
+    }
+
+    [Fact]
     public async Task GetLiveAlerts_ReturnsOkWithData()
     {
         var response = await _client.GetAsync("/api/v1/live-alerts");
@@ -33,6 +45,17 @@ public class PortfolioInsightsEndpointsTests : IClassFixture<WebApplicationFacto
         var items = json.RootElement.GetProperty("data");
         Assert.True(items.GetArrayLength() > 0);
         Assert.Contains("alert-", items[0].GetProperty("id").GetString());
+    }
+
+    [Fact]
+    public async Task GetLiveAlerts_WithLimit_ReturnsLimitedItems()
+    {
+        var response = await _client.GetAsync("/api/v1/live-alerts?limit=2");
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+        var items = json.RootElement.GetProperty("data");
+        Assert.Equal(2, items.GetArrayLength());
     }
 
     [Fact]
