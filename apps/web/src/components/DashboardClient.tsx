@@ -34,6 +34,7 @@ export function DashboardClient({
   const [summaryError, setSummaryError] = useState("");
   const [insightsError, setInsightsError] = useState("");
   const [refreshBusy, setRefreshBusy] = useState(false);
+  const [refreshNotice, setRefreshNotice] = useState("");
 
   const pollingKey = useMemo(() => holdings.map((h) => h.symbol).join(","), [holdings]);
   const normalizedSymbol = newSymbol.trim().toUpperCase();
@@ -95,10 +96,18 @@ export function DashboardClient({
     } else {
       setInsightsError("");
     }
+
+    const failuresCount = [nextSummary, nextHoldings, nextImpactCards, nextLiveAlerts, nextMacroMap].filter((x) => x.status !== "fulfilled").length;
+    if (failuresCount === 0) {
+      setRefreshNotice("Refresh complete.");
+    } else {
+      setRefreshNotice(`Refresh completed with ${failuresCount} partial failure(s).`);
+    }
   }
 
   async function onManualRefresh() {
     setRefreshBusy(true);
+    setRefreshNotice("");
     try {
       await refreshAll();
     } finally {
@@ -151,6 +160,7 @@ export function DashboardClient({
           {refreshBusy ? "Refreshing..." : "Refresh"}
         </button>
       </p>
+      {refreshNotice ? <p><small>{refreshNotice}</small></p> : null}
 
       <section>
         <h2>Summary</h2>

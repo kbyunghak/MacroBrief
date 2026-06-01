@@ -90,6 +90,22 @@ Step 4 is complete when:
 - Polling and refresh behavior are fixed
 - Feedback action path is fixed
 
+## 9. Current Implementation Snapshot (2026-06-01)
+
+- Web app scaffolded with Next.js App Router at `apps/web`
+- API client layer implemented for all Step 3 endpoints
+- Dashboard sections wired:
+  - Summary
+  - Holdings (add/remove)
+  - Morning Brief
+  - Impact Cards
+  - Live Alerts
+  - Macro Map
+- Live alerts polling wired with configurable interval from `NEXT_PUBLIC_ALERT_POLL_MINUTES`
+- Manual refresh action added with partial-failure messaging
+- Feedback action (`Relevant` / `Not Relevant`) calls `POST /api/v1/feedback/relevance`
+- Partial failure handling implemented with previous-data retention
+
 ---
 
 Version: v1
