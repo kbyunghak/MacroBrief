@@ -149,7 +149,17 @@ Step 5 is complete when:
 - Internal audit endpoint added for development validation:
   - `GET /api/v1/internal/ai/audit?limit=20`
 - Internal summary endpoint added for quick quality tracking:
-  - `GET /api/v1/internal/ai/audit/summary`
+  - `GET /api/v1/internal/ai/audit/summary?window=50`
+  - includes `fallback_rate` and `fallback_rate_warning` for monitoring
+
+## 13. Step 5 Exit Progress (2026-06-01)
+
+- Prompt policy fixed: Done
+- Banned language list fixed: Done
+- Validation/regeneration/fallback flow fixed: In progress
+  - validation + fallback implemented
+  - explicit multi-regeneration strategy still pending
+- Example outputs approved: Pending
 - Unit/integration tests added for guardrail behavior and audit endpoint.
 
 ---

@@ -9,10 +9,12 @@ public static class AiGuardrailsEndpoints
             return Results.Ok(ApiResponse<IEnumerable<AiExplanationAuditItem>>.Ok(logs));
         });
 
-        app.MapGet("/api/v1/internal/ai/audit/summary", (IAiExplanationService aiExplanationService) =>
+        app.MapGet("/api/v1/internal/ai/audit/summary", (int? window, IAiExplanationService aiExplanationService) =>
         {
             var logs = aiExplanationService.GetAuditLogs();
-            var topBlockedTerms = logs
+            var windowSize = Math.Clamp(window ?? 50, 1, 500);
+            var windowLogs = logs.Take(windowSize).ToList();
+            var topBlockedTerms = windowLogs
                 .SelectMany(x => x.BlockedTermsDetected)
                 .GroupBy(x => x, StringComparer.OrdinalIgnoreCase)
                 .OrderByDescending(g => g.Count())
@@ -21,10 +23,16 @@ public static class AiGuardrailsEndpoints
                 .Select(g => g.Key)
                 .ToList();
 
+            var fallbackUsedCount = windowLogs.Count(x => x.FallbackUsed);
+            var fallbackRate = windowLogs.Count == 0 ? 0 : (double)fallbackUsedCount / windowLogs.Count;
+
             var payload = new AiAuditSummary(
-                TotalLogs: logs.Count,
-                FallbackUsedCount: logs.Count(x => x.FallbackUsed),
-                BlockedTermDetections: logs.Sum(x => x.BlockedTermsDetected.Count),
+                WindowSize: windowSize,
+                TotalLogs: windowLogs.Count,
+                FallbackUsedCount: fallbackUsedCount,
+                FallbackRate: Math.Round(fallbackRate, 3),
+                FallbackRateWarning: fallbackRate >= 0.4,
+                BlockedTermDetections: windowLogs.Sum(x => x.BlockedTermsDetected.Count),
                 TopBlockedTerms: topBlockedTerms);
 
             return Results.Ok(ApiResponse<AiAuditSummary>.Ok(payload));
