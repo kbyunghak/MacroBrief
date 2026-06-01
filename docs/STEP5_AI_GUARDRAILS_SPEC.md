@@ -151,8 +151,19 @@ Step 5 is complete when:
   - `GET /api/v1/internal/ai/audit?limit=20`
 - Internal summary endpoint added for quick quality tracking:
   - `GET /api/v1/internal/ai/audit/summary?window=50`
-  - includes `fallback_rate` and `fallback_rate_warning` for monitoring
+  - includes `fallback_rate`, `fallback_rate_level`, and `fallback_rate_warning` for monitoring
   - includes top validation failure codes for triage
+
+## 14. Approved Output Snapshot (2026-06-01)
+
+Approved reference style for current scaffold:
+- "This update may be relevant because changes in ai_semiconductors can influence NVDA through semiconductor demand expectations."
+- "This update may be relevant because changes in oil_energy can influence XOM through energy price volatility."
+- "This update may be relevant because changes in interest_rates can influence SOFI through funding and valuation assumptions."
+
+Approval note:
+- These examples are informational, conditional, and non-advisory.
+- They satisfy required phrase and banned-language constraints in current guardrail config.
 
 ## 13. Step 5 Exit Progress (2026-06-01)
 
@@ -162,7 +173,7 @@ Step 5 is complete when:
   - validation + fallback implemented
   - multi-regeneration strategy implemented (max 2 attempts)
   - failure-code audit tracking implemented
-- Example outputs approved: Pending
+- Example outputs approved: Done (scaffold snapshot)
 - Unit/integration tests added for guardrail behavior and audit endpoint.
 
 ---

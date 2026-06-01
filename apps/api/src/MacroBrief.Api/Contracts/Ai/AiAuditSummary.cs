@@ -3,6 +3,7 @@ public record AiAuditSummary(
     int TotalLogs,
     int FallbackUsedCount,
     double FallbackRate,
+    string FallbackRateLevel,
     bool FallbackRateWarning,
     int BlockedTermDetections,
     IReadOnlyList<string> TopBlockedTerms,

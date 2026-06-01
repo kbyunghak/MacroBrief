@@ -34,12 +34,19 @@ public static class AiGuardrailsEndpoints
 
             var fallbackUsedCount = windowLogs.Count(x => x.FallbackUsed);
             var fallbackRate = windowLogs.Count == 0 ? 0 : (double)fallbackUsedCount / windowLogs.Count;
+            var fallbackRateLevel = fallbackRate switch
+            {
+                >= 0.4 => "high",
+                >= 0.2 => "medium",
+                _ => "low"
+            };
 
             var payload = new AiAuditSummary(
                 WindowSize: windowSize,
                 TotalLogs: windowLogs.Count,
                 FallbackUsedCount: fallbackUsedCount,
                 FallbackRate: Math.Round(fallbackRate, 3),
+                FallbackRateLevel: fallbackRateLevel,
                 FallbackRateWarning: fallbackRate >= 0.4,
                 BlockedTermDetections: windowLogs.Sum(x => x.BlockedTermsDetected.Count),
                 TopBlockedTerms: topBlockedTerms,
