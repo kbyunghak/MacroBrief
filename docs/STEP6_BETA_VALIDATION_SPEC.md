@@ -120,6 +120,32 @@ Step 6 is complete when:
 - Relevance feedback endpoint and UI action path: available
 - Internal AI audit/summary endpoints for quality monitoring: available
 
+## 12. KPI Event Logging Contract (2026-06-01)
+
+Use shared schemas:
+- `shared/contracts/beta_kpi_events.v1.json`
+- `shared/contracts/beta_weekly_rollup.v1.json`
+
+Required event fields:
+- event_id
+- event_type
+- user_id
+- occurred_at_utc
+- session_id
+
+Feedback reason tags:
+- wrong_category
+- weak_explanation
+- stale_update
+- duplicate_content
+
+## 13. Step 6 Execution Start Checklist
+
+- Implement event emitters in web for app_open, refresh, holding add/remove, impact feedback, alert view, source click.
+- Add API or pipeline sink for raw event storage (append-only).
+- Generate weekly rollup using `beta_weekly_rollup.v1.json` field contract.
+- Start Week 1 baseline without rule changes.
+
 ---
 
 Version: v1

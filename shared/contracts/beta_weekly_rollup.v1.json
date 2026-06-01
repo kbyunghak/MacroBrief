@@ -1,0 +1,21 @@
+{
+  "version": "v1",
+  "required_fields": [
+    "week_start_date",
+    "cohort_size",
+    "weekly_active_users",
+    "d7_retention_rate",
+    "relevance_positive_ratio",
+    "alert_click_through_rate",
+    "source_click_rate",
+    "explanation_policy_violation_rate"
+  ],
+  "optional_fields": [
+    "false_relevance_rate",
+    "duplicate_alert_rate",
+    "missing_source_rate",
+    "top_feedback_themes",
+    "rule_version",
+    "notes"
+  ]
+}

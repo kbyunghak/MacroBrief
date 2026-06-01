@@ -1,0 +1,40 @@
+{
+  "version": "v1",
+  "event_types": [
+    "app_open",
+    "dashboard_refresh",
+    "holding_add",
+    "holding_remove",
+    "impact_feedback",
+    "alert_view",
+    "source_click"
+  ],
+  "required_fields": [
+    "event_id",
+    "event_type",
+    "user_id",
+    "occurred_at_utc",
+    "session_id"
+  ],
+  "optional_fields": [
+    "symbol",
+    "news_event_id",
+    "feedback",
+    "reason_tag",
+    "source_name",
+    "source_url",
+    "meta"
+  ],
+  "feedback_reason_tags": [
+    "wrong_category",
+    "weak_explanation",
+    "stale_update",
+    "duplicate_content"
+  ],
+  "kpi_mapping": {
+    "weekly_active_usage": ["app_open"],
+    "relevance_positive_ratio": ["impact_feedback"],
+    "alert_click_through_rate": ["alert_view"],
+    "source_click_rate": ["source_click"]
+  }
+}
