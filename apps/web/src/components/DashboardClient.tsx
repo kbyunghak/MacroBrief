@@ -154,7 +154,7 @@ export function DashboardClient({
   return (
     <main>
       <h1>MacroBrief Dashboard</h1>
-      <p>Last updated: {lastUpdatedLabel}</p>
+      <p>Summary updated: {lastUpdatedLabel}</p>
       <p>
         <button onClick={() => void onManualRefresh()} disabled={refreshBusy || holdingsBusy || insightsBusy}>
           {refreshBusy ? "Refreshing..." : "Refresh"}

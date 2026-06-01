@@ -16,6 +16,11 @@ export function LiveAlertsClient({ initialItems }: Props) {
   const [status, setStatus] = useState<string>("Live");
   const [polling, setPolling] = useState<boolean>(false);
 
+  function timeLabel() {
+    const now = new Date();
+    return now.toISOString().slice(11, 19);
+  }
+
   useEffect(() => {
     let inFlight = false;
     const tick = async () => {
@@ -25,7 +30,7 @@ export function LiveAlertsClient({ initialItems }: Props) {
       try {
         const nextItems = await apiClient.getLiveAlerts(10);
         setItems(nextItems);
-        setStatus("Updated");
+        setStatus(`Updated at ${timeLabel()}`);
       } catch {
         setStatus("Polling failed (showing last data)");
       } finally {
