@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { apiClient } from "../lib/api-client";
+import { formatSummaryUpdatedLabel } from "../lib/dashboard-format";
 import { ImpactCardsClient } from "./ImpactCardsClient";
 import { LiveAlertsClient } from "./LiveAlertsClient";
 import type { DashboardSummary, Holding, ImpactCard, LiveAlert, MacroMapItem } from "../types/api";
@@ -41,7 +42,7 @@ export function DashboardClient({
   const normalizedSymbol = newSymbol.trim().toUpperCase();
   const canAddHolding = !holdingsBusy && normalizedSymbol.length > 0;
   const refreshDisabled = refreshBusy || holdingsBusy || insightsBusy || refreshCooldownSec > 0;
-  const lastUpdatedLabel = new Date(summary.lastUpdatedAt).toISOString().replace("T", " ").replace("Z", " UTC");
+  const lastUpdatedLabel = formatSummaryUpdatedLabel(summary.lastUpdatedAt);
 
   function normalizeHoldingsErrorMessage(raw: string) {
     if (raw.includes("duplicate_symbol")) return "This symbol is already in your holdings.";

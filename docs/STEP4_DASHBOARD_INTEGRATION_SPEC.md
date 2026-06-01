@@ -102,9 +102,11 @@ Step 4 is complete when:
   - Live Alerts
   - Macro Map
 - Live alerts polling wired with configurable interval from `NEXT_PUBLIC_ALERT_POLL_MINUTES`
-- Manual refresh action added with partial-failure messaging
+- Live alerts polling pauses on hidden tab and refreshes on focus return
+- Manual refresh action added with partial-failure messaging and 5-second cooldown
 - Feedback action (`Relevant` / `Not Relevant`) calls `POST /api/v1/feedback/relevance`
 - Partial failure handling implemented with previous-data retention
+- Web unit test entry added for dashboard formatting utilities (`vitest`)
 
 ---
 

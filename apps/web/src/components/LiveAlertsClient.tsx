@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { apiClient } from "../lib/api-client";
+import { formatTimeHms } from "../lib/dashboard-format";
 import type { LiveAlert } from "../types/api";
 
 type Props = {
@@ -16,11 +17,6 @@ export function LiveAlertsClient({ initialItems }: Props) {
   const [status, setStatus] = useState<string>("Live");
   const [polling, setPolling] = useState<boolean>(false);
 
-  function timeLabel() {
-    const now = new Date();
-    return now.toISOString().slice(11, 19);
-  }
-
   useEffect(() => {
     let inFlight = false;
     const tick = async () => {
@@ -30,7 +26,7 @@ export function LiveAlertsClient({ initialItems }: Props) {
       try {
         const nextItems = await apiClient.getLiveAlerts(10);
         setItems(nextItems);
-        setStatus(`Updated at ${timeLabel()}`);
+        setStatus(`Updated at ${formatTimeHms(new Date())}`);
       } catch {
         setStatus("Polling failed (showing last data)");
       } finally {
