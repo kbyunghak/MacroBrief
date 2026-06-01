@@ -23,6 +23,24 @@ public class AiGuardrailsEndpointsTests : IClassFixture<WebApplicationFactory<Pr
         var json = JsonDocument.Parse(await auditResponse.Content.ReadAsStringAsync());
         var items = json.RootElement.GetProperty("data");
         Assert.True(items.GetArrayLength() > 0);
+        Assert.False(string.IsNullOrWhiteSpace(items[0].GetProperty("symbol").GetString()));
+        Assert.False(string.IsNullOrWhiteSpace(items[0].GetProperty("macroFactor").GetString()));
         Assert.False(string.IsNullOrWhiteSpace(items[0].GetProperty("promptVersion").GetString()));
+    }
+
+    [Fact]
+    public async Task GetAuditSummary_ReturnsAggregateFields()
+    {
+        var cardsResponse = await _client.GetAsync("/api/v1/impact-cards");
+        Assert.Equal(HttpStatusCode.OK, cardsResponse.StatusCode);
+
+        var summaryResponse = await _client.GetAsync("/api/v1/internal/ai/audit/summary");
+        Assert.Equal(HttpStatusCode.OK, summaryResponse.StatusCode);
+
+        var json = JsonDocument.Parse(await summaryResponse.Content.ReadAsStringAsync());
+        var data = json.RootElement.GetProperty("data");
+        Assert.True(data.GetProperty("totalLogs").GetInt32() > 0);
+        Assert.True(data.GetProperty("fallbackUsedCount").GetInt32() >= 0);
+        Assert.True(data.GetProperty("blockedTermDetections").GetInt32() >= 0);
     }
 }

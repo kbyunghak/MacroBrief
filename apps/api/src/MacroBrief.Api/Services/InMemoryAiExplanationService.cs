@@ -55,6 +55,8 @@ public class InMemoryAiExplanationService : IAiExplanationService
         var confidence = GetConfidence(score);
 
         _logs.Add(new AiExplanationAuditItem(
+            Symbol: symbol,
+            MacroFactor: macroFactor,
             PromptVersion: _promptVersion,
             OutputText: outputText,
             BlockedTermsDetected: blockedTerms,

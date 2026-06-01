@@ -148,6 +148,8 @@ Step 5 is complete when:
 - Portfolio impact-card reason text now flows through guardrail service.
 - Internal audit endpoint added for development validation:
   - `GET /api/v1/internal/ai/audit?limit=20`
+- Internal summary endpoint added for quick quality tracking:
+  - `GET /api/v1/internal/ai/audit/summary`
 - Unit/integration tests added for guardrail behavior and audit endpoint.
 
 ---
