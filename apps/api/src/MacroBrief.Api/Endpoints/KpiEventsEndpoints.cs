@@ -121,6 +121,19 @@ public static class KpiEventsEndpoints
                 ? 0
                 : (double)aiLogs.Count(x => x.ValidationFailureCodes.Count > 0) / aiLogs.Count;
 
+            var kpiHealth = relevancePositiveRatio switch
+            {
+                >= 0.7 => "green",
+                >= 0.5 => "yellow",
+                _ => "red"
+            };
+            var recommendation = kpiHealth switch
+            {
+                "green" => "proceed",
+                "yellow" => "iterate",
+                _ => "reposition"
+            };
+
             var rollup = new BetaWeeklyRollup(
                 WeekStartDate: DateOnly.FromDateTime(fromUtc.Date),
                 CohortSize: cohortSize,
@@ -130,6 +143,8 @@ public static class KpiEventsEndpoints
                 AlertClickThroughRate: Math.Round(alertCtr, 3),
                 SourceClickRate: Math.Round(sourceClickRate, 3),
                 ExplanationPolicyViolationRate: Math.Round(explanationPolicyViolationRate, 3),
+                KpiHealth: kpiHealth,
+                Recommendation: recommendation,
                 FalseRelevanceRate: Math.Round(falseRelevanceRate, 3),
                 DuplicateAlertRate: 0,
                 MissingSourceRate: 0,

@@ -163,6 +163,7 @@ Feedback reason tags:
   - `GET /api/v1/internal/events/summary` (quick KPI sanity check)
   - `GET /api/v1/internal/events/weekly-rollup` (beta KPI draft rollup)
   - D7 retention now estimated from app_open first/last seen timestamps in selected window
+  - weekly rollup now includes `kpi_health` (green/yellow/red) and recommendation (proceed/iterate/reposition)
 
 ---
 

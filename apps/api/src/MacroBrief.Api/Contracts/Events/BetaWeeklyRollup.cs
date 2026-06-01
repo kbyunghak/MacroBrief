@@ -7,6 +7,8 @@ public record BetaWeeklyRollup(
     double AlertClickThroughRate,
     double SourceClickRate,
     double ExplanationPolicyViolationRate,
+    string KpiHealth,
+    string Recommendation,
     double FalseRelevanceRate,
     double DuplicateAlertRate,
     double MissingSourceRate,

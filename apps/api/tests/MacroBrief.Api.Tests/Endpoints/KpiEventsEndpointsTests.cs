@@ -75,5 +75,7 @@ public class KpiEventsEndpointsTests : IClassFixture<WebApplicationFactory<Progr
         var data = json.RootElement.GetProperty("data");
         Assert.True(data.GetProperty("weeklyActiveUsers").GetInt32() >= 1);
         Assert.True(data.GetProperty("relevancePositiveRatio").GetDouble() >= 0);
+        Assert.False(string.IsNullOrWhiteSpace(data.GetProperty("kpiHealth").GetString()));
+        Assert.False(string.IsNullOrWhiteSpace(data.GetProperty("recommendation").GetString()));
     }
 }

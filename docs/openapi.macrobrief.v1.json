@@ -143,6 +143,7 @@
         "parameters": [
           {"name": "days", "in": "query", "schema": {"type": "integer", "default": 7, "minimum": 1, "maximum": 30}}
         ],
+        "description": "Includes KPI health status and recommendation derived from beta decision gates.",
         "responses": {"200": {"description": "OK"}}
       }
     }
