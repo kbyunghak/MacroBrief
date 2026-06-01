@@ -130,6 +130,26 @@ Step 5 is complete when:
 - Validation/regeneration/fallback flow is fixed
 - Example outputs are approved
 
+## 12. Current Implementation Snapshot (2026-06-01)
+
+- Guardrail config source: `docs/ai_guardrails.v1.json`
+- API guardrail service scaffold implemented:
+  - banned-term detection
+  - max-length and required-phrase validation
+  - safe fallback template generation
+- Audit log model and in-memory storage implemented:
+  - prompt_version
+  - output_text
+  - blocked_terms_detected
+  - regeneration_count
+  - fallback_used
+  - confidence_label
+  - created_at
+- Portfolio impact-card reason text now flows through guardrail service.
+- Internal audit endpoint added for development validation:
+  - `GET /api/v1/internal/ai/audit?limit=20`
+- Unit/integration tests added for guardrail behavior and audit endpoint.
+
 ---
 
 Version: v1

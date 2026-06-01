@@ -28,6 +28,7 @@ app.MapDashboardEndpoints();
 app.MapHoldingEndpoints();
 app.MapPortfolioInsightsEndpoints();
 app.MapFeedbackEndpoints();
+app.MapAiGuardrailsEndpoints();
 
 app.Run();
 
