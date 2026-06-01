@@ -38,6 +38,8 @@ export type LiveAlert = {
   category: string;
   severity: string;
   message: string;
+  sourceName: string;
+  sourceUrl: string;
 };
 
 export type MacroMapItem = {

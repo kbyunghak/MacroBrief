@@ -54,12 +54,23 @@ export function LiveAlertsClient({ initialItems }: Props) {
     };
   }, []);
 
-  function onAlertClick(alert: LiveAlert) {
+  function onAlertView(alert: LiveAlert) {
     void emitKpiEvent("alert_view", {
       newsEventId: alert.id,
       meta: {
         category: alert.category,
         severity: alert.severity
+      }
+    });
+  }
+
+  function onSourceClick(alert: LiveAlert) {
+    void emitKpiEvent("source_click", {
+      newsEventId: alert.id,
+      sourceName: alert.sourceName,
+      sourceUrl: alert.sourceUrl,
+      meta: {
+        category: alert.category
       }
     });
   }
@@ -74,8 +85,20 @@ export function LiveAlertsClient({ initialItems }: Props) {
       ) : (
         <ul>
           {items.map((alert) => (
-            <li key={alert.id} onClick={() => onAlertClick(alert)} style={{ cursor: "pointer" }}>
+            <li key={alert.id} onClick={() => onAlertView(alert)} style={{ cursor: "pointer" }}>
               {alert.category} / {alert.severity}: {alert.message}
+              {" "}
+              <a
+                href={alert.sourceUrl}
+                target="_blank"
+                rel="noreferrer"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onSourceClick(alert);
+                }}
+              >
+                [{alert.sourceName}]
+              </a>
             </li>
           ))}
         </ul>

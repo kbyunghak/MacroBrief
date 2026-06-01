@@ -155,6 +155,8 @@ Feedback reason tags:
   - holding_add
   - holding_remove
   - impact_feedback
+  - alert_view
+  - source_click (from alert source links)
 - API event ingestion scaffold implemented:
   - `POST /api/v1/events`
   - `GET /api/v1/internal/events` (development inspection)

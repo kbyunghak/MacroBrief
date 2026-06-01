@@ -33,6 +33,7 @@
       "get": {
         "summary": "Get live alerts",
         "parameters": [{"name": "limit", "in": "query", "schema": {"type": "integer", "default": 20}}],
+        "description": "Each alert includes sourceName and sourceUrl for source click tracking.",
         "responses": {"200": {"description": "OK"}}
       }
     },

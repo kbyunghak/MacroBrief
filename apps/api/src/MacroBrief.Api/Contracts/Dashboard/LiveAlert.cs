@@ -3,4 +3,6 @@ public record LiveAlert(
     DateTime CreatedAtUtc,
     string Category,
     string Severity,
-    string Message);
+    string Message,
+    string SourceName,
+    string SourceUrl);

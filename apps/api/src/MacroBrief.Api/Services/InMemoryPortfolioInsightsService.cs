@@ -64,12 +64,29 @@ public class InMemoryPortfolioInsightsService : IPortfolioInsightsService
     private LiveAlert BuildLiveAlert(string symbol, int index, DateTime now)
     {
         var category = GetCategory(symbol);
+        var sourceName = category switch
+        {
+            "Semiconductors" => "Tech Policy Wire",
+            "Energy" => "Energy Market Desk",
+            "Interest Rates" => "Rates Monitor",
+            _ => "Macro Update Desk"
+        };
+        var sourceUrl = category switch
+        {
+            "Semiconductors" => "https://example.com/tech-policy",
+            "Energy" => "https://example.com/energy-market",
+            "Interest Rates" => "https://example.com/rates-monitor",
+            _ => "https://example.com/macro-desk"
+        };
+
         return new LiveAlert(
             $"alert-{symbol.ToLowerInvariant()}-{index + 1}",
             now.AddMinutes(-(index + 1) * 3),
             category,
             index == 0 ? "watch" : "info",
-            $"{symbol}: {category} event relevance updated.");
+            $"{symbol}: {category} event relevance updated.",
+            sourceName,
+            sourceUrl);
     }
 
     private string GetCategory(string symbol)

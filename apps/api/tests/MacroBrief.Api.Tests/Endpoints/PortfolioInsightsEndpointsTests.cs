@@ -45,6 +45,8 @@ public class PortfolioInsightsEndpointsTests : IClassFixture<WebApplicationFacto
         var items = json.RootElement.GetProperty("data");
         Assert.True(items.GetArrayLength() > 0);
         Assert.Contains("alert-", items[0].GetProperty("id").GetString());
+        Assert.False(string.IsNullOrWhiteSpace(items[0].GetProperty("sourceName").GetString()));
+        Assert.False(string.IsNullOrWhiteSpace(items[0].GetProperty("sourceUrl").GetString()));
     }
 
     [Fact]
