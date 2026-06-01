@@ -1,0 +1,62 @@
+﻿{
+  "version": "v1",
+  "updated_at": "2026-05-31",
+  "categories": {
+    "interest_rates": {
+      "strong": ["rate hike", "higher rates", "policy rate", "borrowing costs"],
+      "weak": ["rates", "tightening", "easing"]
+    },
+    "fed_inflation": {
+      "strong": ["fed chair", "fomc", "cpi surprise", "inflation print"],
+      "weak": ["fed", "inflation", "core prices"]
+    },
+    "treasury_yields": {
+      "strong": ["10-year yield", "treasury auction", "yield spike"],
+      "weak": ["treasury yields", "bond yields"]
+    },
+    "oil_energy": {
+      "strong": ["wti surge", "brent jumps", "crude rally", "oil supply shock"],
+      "weak": ["oil prices", "energy market", "crude"]
+    },
+    "opec": {
+      "strong": ["opec+ output cut", "quota change", "production discipline"],
+      "weak": ["opec meeting", "opec signals"]
+    },
+    "middle_east_risk": {
+      "strong": ["strait disruption", "regional escalation", "supply route risk"],
+      "weak": ["middle east tension", "geopolitical risk"]
+    },
+    "china_demand": {
+      "strong": ["china ev sales drop", "china demand shock", "weak china imports"],
+      "weak": ["china demand", "china growth"]
+    },
+    "ai_semiconductors": {
+      "strong": ["data center capex", "gpu demand", "chip export rule"],
+      "weak": ["ai spending", "semiconductor outlook"]
+    },
+    "consumer_credit": {
+      "strong": ["auto loan delinquency", "credit tightening", "lending standards"],
+      "weak": ["consumer credit", "loan demand"]
+    },
+    "usd_strength": {
+      "strong": ["dollar index surge", "strong usd trend"],
+      "weak": ["dollar strength", "usd move"]
+    }
+  },
+  "ticker_exposure": {
+    "TSLA": ["ev", "growth", "interest_rates", "consumer_credit", "china_demand", "auto_financing"],
+    "XOM": ["oil_energy", "opec", "middle_east_risk", "crude_inventory", "usd_strength"],
+    "CVX": ["oil_energy", "opec", "middle_east_risk", "crude_inventory", "usd_strength"],
+    "NVDA": ["ai_semiconductors", "data_center_spending", "export_controls", "interest_rates"],
+    "SOFI": ["consumer_credit", "interest_rates", "fintech", "loan_demand", "credit_risk"]
+  },
+  "scoring": {
+    "base_category_match": 3,
+    "strong_keyword": 2,
+    "weak_keyword": 1,
+    "multi_category_bonus": 1,
+    "source_quality_bonus": 1,
+    "impact_card_threshold": 4,
+    "live_alert_threshold": 5
+  }
+}
