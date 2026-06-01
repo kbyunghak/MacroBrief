@@ -14,15 +14,19 @@ const pollMs = Math.max(1, pollMinutes) * 60 * 1000;
 export function LiveAlertsClient({ initialItems }: Props) {
   const [items, setItems] = useState<LiveAlert[]>(initialItems);
   const [status, setStatus] = useState<string>("Live");
+  const [polling, setPolling] = useState<boolean>(false);
 
   useEffect(() => {
     const timer = setInterval(async () => {
+      setPolling(true);
       try {
         const nextItems = await apiClient.getLiveAlerts(10);
         setItems(nextItems);
-        setStatus(`Updated ${new Date().toLocaleTimeString()}`);
+        setStatus("Updated");
       } catch {
         setStatus("Polling failed (showing last data)");
+      } finally {
+        setPolling(false);
       }
     }, pollMs);
 
@@ -32,15 +36,19 @@ export function LiveAlertsClient({ initialItems }: Props) {
   return (
     <>
       <p>
-        <small>{status}</small>
+        <small>{polling ? "Refreshing..." : status}</small>
       </p>
-      <ul>
-        {items.map((alert) => (
-          <li key={alert.id}>
-            {alert.category} / {alert.severity}: {alert.message}
-          </li>
-        ))}
-      </ul>
+      {items.length === 0 ? (
+        <p>No live alerts yet.</p>
+      ) : (
+        <ul>
+          {items.map((alert) => (
+            <li key={alert.id}>
+              {alert.category} / {alert.severity}: {alert.message}
+            </li>
+          ))}
+        </ul>
+      )}
     </>
   );
 }

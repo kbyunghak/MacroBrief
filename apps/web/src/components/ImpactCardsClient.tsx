@@ -10,8 +10,10 @@ type Props = {
 
 export function ImpactCardsClient({ items }: Props) {
   const [messageBySymbol, setMessageBySymbol] = useState<Record<string, string>>({});
+  const [busyBySymbol, setBusyBySymbol] = useState<Record<string, boolean>>({});
 
   async function submit(symbol: string, feedback: "relevant" | "not_relevant") {
+    setBusyBySymbol((prev) => ({ ...prev, [symbol]: true }));
     try {
       await apiClient.submitRelevanceFeedback({
         newsEventId: `impact-${symbol.toLowerCase()}`,
@@ -21,7 +23,13 @@ export function ImpactCardsClient({ items }: Props) {
       setMessageBySymbol((prev) => ({ ...prev, [symbol]: "Saved" }));
     } catch {
       setMessageBySymbol((prev) => ({ ...prev, [symbol]: "Failed" }));
+    } finally {
+      setBusyBySymbol((prev) => ({ ...prev, [symbol]: false }));
     }
+  }
+
+  if (items.length === 0) {
+    return <p>No impact cards available.</p>;
   }
 
   return (
@@ -30,9 +38,13 @@ export function ImpactCardsClient({ items }: Props) {
         <li key={`${card.symbol}-${card.headline}`} style={{ marginBottom: 8 }}>
           <strong>{card.symbol}</strong> [{card.impactLevel}] {card.headline}
           <div>
-            <button onClick={() => submit(card.symbol, "relevant")}>Relevant</button>{" "}
-            <button onClick={() => submit(card.symbol, "not_relevant")}>Not Relevant</button>{" "}
-            <small>{messageBySymbol[card.symbol] ?? ""}</small>
+            <button onClick={() => void submit(card.symbol, "relevant")} disabled={busyBySymbol[card.symbol]}>
+              Relevant
+            </button>{" "}
+            <button onClick={() => void submit(card.symbol, "not_relevant")} disabled={busyBySymbol[card.symbol]}>
+              Not Relevant
+            </button>{" "}
+            <small>{busyBySymbol[card.symbol] ? "Saving..." : (messageBySymbol[card.symbol] ?? "")}</small>
           </div>
         </li>
       ))}
