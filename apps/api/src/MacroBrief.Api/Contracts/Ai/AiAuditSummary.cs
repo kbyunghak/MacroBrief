@@ -5,4 +5,5 @@ public record AiAuditSummary(
     double FallbackRate,
     bool FallbackRateWarning,
     int BlockedTermDetections,
-    IReadOnlyList<string> TopBlockedTerms);
+    IReadOnlyList<string> TopBlockedTerms,
+    IReadOnlyList<string> TopFailureCodes);

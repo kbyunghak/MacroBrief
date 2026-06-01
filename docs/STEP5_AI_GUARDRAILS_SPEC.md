@@ -152,6 +152,7 @@ Step 5 is complete when:
 - Internal summary endpoint added for quick quality tracking:
   - `GET /api/v1/internal/ai/audit/summary?window=50`
   - includes `fallback_rate` and `fallback_rate_warning` for monitoring
+  - includes top validation failure codes for triage
 
 ## 13. Step 5 Exit Progress (2026-06-01)
 

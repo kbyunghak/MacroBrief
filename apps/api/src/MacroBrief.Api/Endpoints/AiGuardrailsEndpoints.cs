@@ -23,6 +23,15 @@ public static class AiGuardrailsEndpoints
                 .Select(g => g.Key)
                 .ToList();
 
+            var topFailureCodes = windowLogs
+                .SelectMany(x => x.ValidationFailureCodes)
+                .GroupBy(x => x, StringComparer.OrdinalIgnoreCase)
+                .OrderByDescending(g => g.Count())
+                .ThenBy(g => g.Key)
+                .Take(5)
+                .Select(g => g.Key)
+                .ToList();
+
             var fallbackUsedCount = windowLogs.Count(x => x.FallbackUsed);
             var fallbackRate = windowLogs.Count == 0 ? 0 : (double)fallbackUsedCount / windowLogs.Count;
 
@@ -33,7 +42,8 @@ public static class AiGuardrailsEndpoints
                 FallbackRate: Math.Round(fallbackRate, 3),
                 FallbackRateWarning: fallbackRate >= 0.4,
                 BlockedTermDetections: windowLogs.Sum(x => x.BlockedTermsDetected.Count),
-                TopBlockedTerms: topBlockedTerms);
+                TopBlockedTerms: topBlockedTerms,
+                TopFailureCodes: topFailureCodes);
 
             return Results.Ok(ApiResponse<AiAuditSummary>.Ok(payload));
         });
