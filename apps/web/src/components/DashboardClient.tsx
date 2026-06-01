@@ -35,10 +35,12 @@ export function DashboardClient({
   const [insightsError, setInsightsError] = useState("");
   const [refreshBusy, setRefreshBusy] = useState(false);
   const [refreshNotice, setRefreshNotice] = useState("");
+  const [refreshCooldownSec, setRefreshCooldownSec] = useState(0);
 
   const pollingKey = useMemo(() => holdings.map((h) => h.symbol).join(","), [holdings]);
   const normalizedSymbol = newSymbol.trim().toUpperCase();
   const canAddHolding = !holdingsBusy && normalizedSymbol.length > 0;
+  const refreshDisabled = refreshBusy || holdingsBusy || insightsBusy || refreshCooldownSec > 0;
   const lastUpdatedLabel = new Date(summary.lastUpdatedAt).toISOString().replace("T", " ").replace("Z", " UTC");
 
   function normalizeHoldingsErrorMessage(raw: string) {
@@ -106,12 +108,23 @@ export function DashboardClient({
   }
 
   async function onManualRefresh() {
+    if (refreshCooldownSec > 0) return;
     setRefreshBusy(true);
     setRefreshNotice("");
     try {
       await refreshAll();
     } finally {
       setRefreshBusy(false);
+      setRefreshCooldownSec(5);
+      const timer = setInterval(() => {
+        setRefreshCooldownSec((prev) => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
     }
   }
 
@@ -156,10 +169,11 @@ export function DashboardClient({
       <h1>MacroBrief Dashboard</h1>
       <p>Summary updated: {lastUpdatedLabel}</p>
       <p>
-        <button onClick={() => void onManualRefresh()} disabled={refreshBusy || holdingsBusy || insightsBusy}>
+        <button onClick={() => void onManualRefresh()} disabled={refreshDisabled}>
           {refreshBusy ? "Refreshing..." : "Refresh"}
         </button>
       </p>
+      {refreshCooldownSec > 0 ? <p><small>Refresh available in {refreshCooldownSec}s</small></p> : null}
       {refreshNotice ? <p><small>{refreshNotice}</small></p> : null}
 
       <section>
