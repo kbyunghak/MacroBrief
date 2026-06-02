@@ -104,6 +104,7 @@ If relevance positive ratio < 50% after iteration, revisit mapping scope and use
 - Rule changes log
 - Before/after relevance metrics
 - Recommendation: proceed / iterate / reposition
+- Week 1 baseline runbook: `docs/STEP6_WEEK1_BASELINE_RUNBOOK.md`
 
 ## 10. Step 6 Exit Criteria
 
@@ -145,6 +146,7 @@ Feedback reason tags:
 - Add API or pipeline sink for raw event storage (append-only).
 - Generate weekly rollup using `beta_weekly_rollup.v1.json` field contract.
 - Start Week 1 baseline without rule changes.
+- Use `docs/STEP6_WEEK1_BASELINE_RUNBOOK.md` for daily baseline checks and snapshots.
 
 ## 14. Current Implementation Snapshot (2026-06-01)
 

@@ -5,5 +5,6 @@
 - AI guardrails: `docs/ai_guardrails.v1.json`
 - Beta KPI event schema: `shared/contracts/beta_kpi_events.v1.json`
 - Beta weekly KPI rollup schema: `shared/contracts/beta_weekly_rollup.v1.json`
+- Step 6 Week 1 baseline runbook: `docs/STEP6_WEEK1_BASELINE_RUNBOOK.md`
 
 This folder will host typed DTO contracts shared between web and api.
