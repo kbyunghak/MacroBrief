@@ -1,5 +1,7 @@
 public static class KpiEventsEndpoints
 {
+    private const int MinimumFeedbackSampleSize = 5;
+
     private static readonly HashSet<string> AllowedEventTypes = new(StringComparer.OrdinalIgnoreCase)
     {
         "app_open",
@@ -121,7 +123,9 @@ public static class KpiEventsEndpoints
                 ? 0
                 : (double)aiLogs.Count(x => x.ValidationFailureCodes.Count > 0) / aiLogs.Count;
 
-            var kpiHealth = relevancePositiveRatio switch
+            var kpiHealth = totalFeedback < MinimumFeedbackSampleSize
+                ? "insufficient_data"
+                : relevancePositiveRatio switch
             {
                 >= 0.7 => "green",
                 >= 0.5 => "yellow",
@@ -131,6 +135,7 @@ public static class KpiEventsEndpoints
             {
                 "green" => "proceed",
                 "yellow" => "iterate",
+                "insufficient_data" => "collect_more_data",
                 _ => "reposition"
             };
 
@@ -139,6 +144,7 @@ public static class KpiEventsEndpoints
                 CohortSize: cohortSize,
                 WeeklyActiveUsers: weeklyActiveUsers,
                 D7RetentionRate: Math.Round(d7RetentionRate, 3),
+                FeedbackSampleSize: totalFeedback,
                 RelevancePositiveRatio: Math.Round(relevancePositiveRatio, 3),
                 AlertClickThroughRate: Math.Round(alertCtr, 3),
                 SourceClickRate: Math.Round(sourceClickRate, 3),
@@ -150,7 +156,7 @@ public static class KpiEventsEndpoints
                 MissingSourceRate: 0,
                 TopFeedbackThemes: feedbackThemes,
                 RuleVersion: "v1",
-                Notes: "D7RetentionRate is estimated from app_open first/last seen timestamps in the selected window.");
+                Notes: $"D7RetentionRate is estimated from app_open first/last seen timestamps in the selected window. KPI health requires at least {MinimumFeedbackSampleSize} feedback events.");
 
             return Results.Ok(ApiResponse<BetaWeeklyRollup>.Ok(rollup));
         });

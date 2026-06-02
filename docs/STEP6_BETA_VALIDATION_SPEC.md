@@ -163,7 +163,8 @@ Feedback reason tags:
   - `GET /api/v1/internal/events/summary` (quick KPI sanity check)
   - `GET /api/v1/internal/events/weekly-rollup` (beta KPI draft rollup)
   - D7 retention now estimated from app_open first/last seen timestamps in selected window
-  - weekly rollup now includes `kpi_health` (green/yellow/red) and recommendation (proceed/iterate/reposition)
+  - weekly rollup now includes `feedback_sample_size`, `kpi_health` (insufficient_data/green/yellow/red), and recommendation (collect_more_data/proceed/iterate/reposition)
+  - KPI health remains `insufficient_data` until at least 5 relevance feedback events exist in the selected window
 
 ---
 

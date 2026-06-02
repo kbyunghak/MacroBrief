@@ -5,10 +5,13 @@
     "cohort_size",
     "weekly_active_users",
     "d7_retention_rate",
+    "feedback_sample_size",
     "relevance_positive_ratio",
     "alert_click_through_rate",
     "source_click_rate",
-    "explanation_policy_violation_rate"
+    "explanation_policy_violation_rate",
+    "kpi_health",
+    "recommendation"
   ],
   "optional_fields": [
     "false_relevance_rate",

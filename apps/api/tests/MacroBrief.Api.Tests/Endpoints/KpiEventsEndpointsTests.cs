@@ -5,17 +5,24 @@ using Microsoft.AspNetCore.Mvc.Testing;
 
 public class KpiEventsEndpointsTests : IClassFixture<WebApplicationFactory<Program>>
 {
-    private readonly HttpClient _client;
+    private readonly WebApplicationFactory<Program> _factory;
 
     public KpiEventsEndpointsTests(WebApplicationFactory<Program> factory)
     {
-        _client = factory.CreateClient();
+        _factory = factory;
+    }
+
+    private HttpClient CreateClient()
+    {
+        return _factory.WithWebHostBuilder(_ => { }).CreateClient();
     }
 
     [Fact]
     public async Task PostEvent_ThenGetRecent_ReturnsStoredEvent()
     {
-        var postResponse = await _client.PostAsJsonAsync("/api/v1/events", new
+        var client = CreateClient();
+
+        var postResponse = await client.PostAsJsonAsync("/api/v1/events", new
         {
             eventId = "evt-test-1",
             eventType = "app_open",
@@ -26,7 +33,7 @@ public class KpiEventsEndpointsTests : IClassFixture<WebApplicationFactory<Progr
 
         Assert.Equal(HttpStatusCode.Created, postResponse.StatusCode);
 
-        var getResponse = await _client.GetAsync("/api/v1/internal/events?limit=5");
+        var getResponse = await client.GetAsync("/api/v1/internal/events?limit=5");
         Assert.Equal(HttpStatusCode.OK, getResponse.StatusCode);
 
         var json = JsonDocument.Parse(await getResponse.Content.ReadAsStringAsync());
@@ -38,7 +45,9 @@ public class KpiEventsEndpointsTests : IClassFixture<WebApplicationFactory<Progr
     [Fact]
     public async Task GetEventsSummary_ReturnsCounts()
     {
-        await _client.PostAsJsonAsync("/api/v1/events", new
+        var client = CreateClient();
+
+        await client.PostAsJsonAsync("/api/v1/events", new
         {
             eventId = "evt-test-2",
             eventType = "holding_add",
@@ -47,7 +56,7 @@ public class KpiEventsEndpointsTests : IClassFixture<WebApplicationFactory<Progr
             sessionId = "ses-test"
         });
 
-        var response = await _client.GetAsync("/api/v1/internal/events/summary?window=50");
+        var response = await client.GetAsync("/api/v1/internal/events/summary?window=50");
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
         var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
@@ -58,7 +67,9 @@ public class KpiEventsEndpointsTests : IClassFixture<WebApplicationFactory<Progr
     [Fact]
     public async Task GetWeeklyRollup_ReturnsKpiFields()
     {
-        await _client.PostAsJsonAsync("/api/v1/events", new
+        var client = CreateClient();
+
+        await client.PostAsJsonAsync("/api/v1/events", new
         {
             eventId = "evt-test-3",
             eventType = "impact_feedback",
@@ -68,14 +79,69 @@ public class KpiEventsEndpointsTests : IClassFixture<WebApplicationFactory<Progr
             feedback = "relevant"
         });
 
-        var response = await _client.GetAsync("/api/v1/internal/events/weekly-rollup?days=7");
+        var response = await client.GetAsync("/api/v1/internal/events/weekly-rollup?days=7");
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
         var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
         var data = json.RootElement.GetProperty("data");
         Assert.True(data.GetProperty("weeklyActiveUsers").GetInt32() >= 1);
+        Assert.Equal(1, data.GetProperty("feedbackSampleSize").GetInt32());
         Assert.True(data.GetProperty("relevancePositiveRatio").GetDouble() >= 0);
         Assert.False(string.IsNullOrWhiteSpace(data.GetProperty("kpiHealth").GetString()));
         Assert.False(string.IsNullOrWhiteSpace(data.GetProperty("recommendation").GetString()));
+    }
+
+    [Fact]
+    public async Task GetWeeklyRollup_WithSmallFeedbackSample_ReturnsInsufficientData()
+    {
+        var client = CreateClient();
+
+        await client.PostAsJsonAsync("/api/v1/events", new
+        {
+            eventId = "evt-small-sample-1",
+            eventType = "impact_feedback",
+            userId = "usr-small-sample",
+            occurredAtUtc = DateTime.UtcNow,
+            sessionId = "ses-small-sample",
+            feedback = "relevant"
+        });
+
+        var response = await client.GetAsync("/api/v1/internal/events/weekly-rollup?days=7");
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+        var data = json.RootElement.GetProperty("data");
+        Assert.Equal(1, data.GetProperty("feedbackSampleSize").GetInt32());
+        Assert.Equal("insufficient_data", data.GetProperty("kpiHealth").GetString());
+        Assert.Equal("collect_more_data", data.GetProperty("recommendation").GetString());
+    }
+
+    [Fact]
+    public async Task GetWeeklyRollup_WithEnoughPositiveFeedback_ReturnsGreenProceed()
+    {
+        var client = CreateClient();
+
+        for (var i = 0; i < 5; i++)
+        {
+            await client.PostAsJsonAsync("/api/v1/events", new
+            {
+                eventId = $"evt-green-{i}",
+                eventType = "impact_feedback",
+                userId = $"usr-green-{i}",
+                occurredAtUtc = DateTime.UtcNow,
+                sessionId = $"ses-green-{i}",
+                feedback = i < 4 ? "relevant" : "not_relevant"
+            });
+        }
+
+        var response = await client.GetAsync("/api/v1/internal/events/weekly-rollup?days=7");
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+        var data = json.RootElement.GetProperty("data");
+        Assert.Equal(5, data.GetProperty("feedbackSampleSize").GetInt32());
+        Assert.Equal(0.8, data.GetProperty("relevancePositiveRatio").GetDouble());
+        Assert.Equal("green", data.GetProperty("kpiHealth").GetString());
+        Assert.Equal("proceed", data.GetProperty("recommendation").GetString());
     }
 }

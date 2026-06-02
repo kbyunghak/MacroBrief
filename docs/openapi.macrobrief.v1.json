@@ -143,7 +143,7 @@
         "parameters": [
           {"name": "days", "in": "query", "schema": {"type": "integer", "default": 7, "minimum": 1, "maximum": 30}}
         ],
-        "description": "Includes KPI health status and recommendation derived from beta decision gates.",
+        "description": "Includes feedback sample size, KPI health status, and recommendation derived from beta decision gates. Health remains insufficient_data until at least 5 relevance feedback events exist in the selected window.",
         "responses": {"200": {"description": "OK"}}
       }
     }

@@ -3,6 +3,7 @@ public record BetaWeeklyRollup(
     int CohortSize,
     int WeeklyActiveUsers,
     double D7RetentionRate,
+    int FeedbackSampleSize,
     double RelevancePositiveRatio,
     double AlertClickThroughRate,
     double SourceClickRate,
