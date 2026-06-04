@@ -7,7 +7,7 @@ public class InMemoryAiExplanationService : IAiExplanationService
     private readonly string _requiredPhrase = "may be relevant because";
     private readonly List<string> _bannedPatterns = [];
     private readonly List<string> _fallbackTemplates = [];
-    private readonly List<AiExplanationAuditItem> _logs = [];
+    protected readonly List<AiExplanationAuditItem> Logs = [];
 
     public InMemoryAiExplanationService(IHostEnvironment environment)
     {
@@ -76,7 +76,7 @@ public class InMemoryAiExplanationService : IAiExplanationService
         var outputText = fallbackUsed ? BuildFallback(symbol, macroFactor, exposurePath) : attemptText;
         var confidence = GetConfidence(score);
 
-        _logs.Add(new AiExplanationAuditItem(
+        AddAuditLog(new AiExplanationAuditItem(
             Symbol: symbol,
             MacroFactor: macroFactor,
             PromptVersion: _promptVersion,
@@ -93,7 +93,17 @@ public class InMemoryAiExplanationService : IAiExplanationService
 
     public IReadOnlyList<AiExplanationAuditItem> GetAuditLogs()
     {
-        return _logs.OrderByDescending(x => x.CreatedAtUtc).ToList();
+        return ReadAuditLogs().OrderByDescending(x => x.CreatedAtUtc).ToList();
+    }
+
+    protected virtual void AddAuditLog(AiExplanationAuditItem item)
+    {
+        Logs.Add(item);
+    }
+
+    protected virtual IReadOnlyList<AiExplanationAuditItem> ReadAuditLogs()
+    {
+        return Logs;
     }
 
     private List<string> FindBlockedTerms(string text)

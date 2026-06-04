@@ -4,7 +4,7 @@ using Microsoft.Extensions.FileProviders;
 public class InMemoryAiExplanationServiceTests
 {
     [Fact]
-    public void BuildGuardedExplanation_UsesFallback_WhenBannedTermsDetected()
+    public void BuildGuardedExplanation_RegeneratesCandidate_WhenBannedTermsDetected()
     {
         var service = new InMemoryAiExplanationService(new StubHostEnvironment());
 
@@ -18,7 +18,8 @@ public class InMemoryAiExplanationServiceTests
         Assert.Contains("may be relevant", output, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("buy signal", output, StringComparison.OrdinalIgnoreCase);
         Assert.NotEmpty(service.GetAuditLogs());
-        Assert.True(service.GetAuditLogs()[0].FallbackUsed);
+        Assert.True(service.GetAuditLogs()[0].RegenerationCount > 0);
+        Assert.False(service.GetAuditLogs()[0].FallbackUsed);
     }
 
     [Fact]

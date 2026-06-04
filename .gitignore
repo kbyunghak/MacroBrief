@@ -25,6 +25,10 @@ pnpm-debug.log*
 .env.local
 .env.*.local
 
+# Local app data
+.local-data/
+
 # Test / coverage artifacts
 coverage/
 TestResults/
+.tmp-test-bin/

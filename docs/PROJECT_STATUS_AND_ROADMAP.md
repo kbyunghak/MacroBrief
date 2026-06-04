@@ -1,16 +1,16 @@
 # MacroBrief Project Status and Roadmap
 
-Last updated: 2026-06-03
+Last updated: 2026-06-04
 
 ## 1. Current Progress
 
-Current phase: Step 6 of 7
+Current phase: Post-Step 7 local-first persistence
 
 Step 6 progress:
 - 1/4 KPI insufficient data handling: complete
 - 2/4 Week 1 baseline runbook: complete
-- 3/4 API KPI test hardening: next
-- 4/4 Step 7 handoff and API key readiness: pending
+- 3/4 API KPI test hardening: complete
+- 4/4 Step 7 handoff and API key readiness: complete
 
 Overall status:
 - Step 0 PRD: complete
@@ -19,8 +19,9 @@ Overall status:
 - Step 3 ingestion/API spec: complete
 - Step 4 dashboard integration: complete
 - Step 5 AI guardrails: complete
-- Step 6 beta validation: in progress
-- Step 7 portfolio packaging: pending
+- Step 6 beta validation: complete
+- Step 7 portfolio packaging: complete
+- Post-Step 7 local-first persistence: in progress
 
 ## 2. What Is Implemented
 
@@ -36,6 +37,8 @@ API:
 - AI guardrail audit endpoints
 - KPI event ingestion endpoints
 - KPI summary and weekly rollup endpoints
+- Internal storage status endpoint
+- Local JSON persistence mode for personal local data
 
 Web:
 - Next.js dashboard app
@@ -55,9 +58,16 @@ Contracts and docs:
 - Beta KPI event contract: `shared/contracts/beta_kpi_events.v1.json`
 - Beta weekly rollup contract: `shared/contracts/beta_weekly_rollup.v1.json`
 - Week 1 baseline runbook: `docs/STEP6_WEEK1_BASELINE_RUNBOOK.md`
+- Step 6 handoff/API key readiness: `docs/STEP6_HANDOFF_AND_API_KEY_READINESS.md`
+- Portfolio architecture summary: `docs/PORTFOLIO_ARCHITECTURE_SUMMARY.md`
+- Portfolio demo walkthrough: `docs/PORTFOLIO_DEMO_WALKTHROUGH.md`
+- Portfolio safety/compliance summary: `docs/PORTFOLIO_SAFETY_COMPLIANCE_SUMMARY.md`
+- Resume/LinkedIn project description: `docs/PORTFOLIO_RESUME_LINKEDIN_DESCRIPTION.md`
+- Beta persistence SQL draft: `infra/sql/002_beta_persistence.sql`
 
 Testing:
 - API endpoint tests with xUnit and WebApplicationFactory
+- Latest API test result: 44 passed, 0 failed
 - Web utility tests with Vitest
 - User confirmed `npm test` passed in `apps/web`
 
@@ -65,8 +75,10 @@ Testing:
 
 Local API:
 - Runs on `http://localhost:5221`
-- Uses in-memory services for MVP scaffolding
-- Stores KPI events only while the API process is running
+- Defaults to in-memory services when no local env file is present
+- Can persist personal local data with `MB_STORAGE_MODE=local_json`
+- Local JSON files are stored under `.local-data/`
+- Storage mode can be checked at `GET /api/v1/internal/storage`
 
 Local Web:
 - Runs on `http://localhost:3000`
@@ -89,6 +101,8 @@ MacroBrief is information-first:
 
 Current implementation is still MVP scaffolding:
 - No persistent database yet
+- SQL migration drafts exist for initial ingestion data and beta persistence tables.
+- Local JSON persistence is available for holdings, relevance feedback, KPI events, and AI audit logs.
 - No user auth yet
 - No real external market/news provider connected yet
 - No paid feature gating yet
@@ -110,48 +124,51 @@ Environment files with real secrets should not be committed:
 - Do not commit `.env.local`
 - Do not commit provider keys or deployment secrets
 
-## 6. Next Work
+## 6. Recently Completed
 
 ### Step 6 - 3/4: API KPI Test Hardening
 
 Goal:
 Lock down KPI event and weekly rollup behavior before moving to portfolio packaging.
 
-Planned tests:
+Completed tests:
 - invalid event type returns 400
 - missing required event fields returns 400
 - event summary counts event types correctly
+- weekly rollup returns `green/proceed`
 - weekly rollup returns `yellow/iterate`
 - weekly rollup returns `red/reposition`
 - weekly rollup preserves `insufficient_data` for small samples
 
-Done when:
+Done:
 - API tests cover green/yellow/red/insufficient_data decision paths
 - event ingestion validation tests exist
-- changes are committed
 
 ### Step 6 - 4/4: Step 7 Handoff and API Key Readiness
 
 Goal:
 Prepare the project for real provider integration without adding secrets.
 
-Planned work:
+Completed work:
 - list required future provider keys in `.env.example`
 - document provider interface plan
 - document which services are currently in-memory
 - define persistence handoff notes
 
-Done when:
+Done:
 - no real API key is required to run the MVP
 - future API key names are documented
 - Step 7 packaging can accurately describe current architecture and next improvements
 
-### Step 7: Portfolio Packaging
+## 7. Step 7 Portfolio Packaging
+
+Status:
+Complete
 
 Goal:
 Package MacroBrief as a strong portfolio/interview artifact.
 
-Planned work:
+Completed work:
 - refresh root README with current architecture
 - write architecture summary
 - write demo walkthrough script
@@ -159,15 +176,31 @@ Planned work:
 - write resume/LinkedIn project description
 - document future improvements honestly
 
-Done when:
+Done:
 - README is current
 - demo flow is clear
 - project story is interview-ready
 
-## 7. Later Roadmap
+## 8. Next Work
 
-Post-Step 7 implementation candidates:
-- persistent database for holdings, feedback, and KPI events
+### Recently Completed Post-Step 7 Work
+
+Local-first persistence:
+- local JSON mode added via `apps/api/.env.local`
+- stores holdings, relevance feedback, KPI events, and AI audit logs under `.local-data/`
+- local data and local env files are ignored by git
+- storage mode can be checked with `GET /api/v1/internal/storage`
+- unit/integration tests cover local JSON persistence and storage status
+
+Portfolio/database readiness:
+- first persistence schema pass added in `infra/sql/002_beta_persistence.sql`
+- future provider/API key placeholders documented without committing real secrets
+
+### Recommended Next Implementation Candidates
+
+- local data reset/export endpoint for demo and development cleanup
+- small beta monitoring panel for feedback/KPI status
+- persistent database evaluation only if multi-user deployment becomes necessary
 - auth and per-user data isolation
 - real news/market data ingestion
 - real AI explanation provider behind guardrails
@@ -176,34 +209,34 @@ Post-Step 7 implementation candidates:
 - deployment setup
 - PWA/mobile readiness from `docs/STEPM0_*` through `docs/STEPM7_*`
 
-## 8. Daily Development Commands
+## 9. Daily Development Commands
 
 Run API:
 
 ```powershell
-cd C:\Users\kbyun\Documents\MacroBrief
-$env:DOTNET_CLI_HOME='C:\Users\kbyun\Documents\MacroBrief\.dotnet'
+cd C:\Users\NathanK\Documents\Project\MacroBrief
+$env:DOTNET_CLI_HOME='C:\Users\NathanK\Documents\Project\MacroBrief\.dotnet'
 dotnet run --project apps/api/src/MacroBrief.Api/MacroBrief.Api.csproj
 ```
 
 Run Web:
 
 ```powershell
-cd C:\Users\kbyun\Documents\MacroBrief\apps\web
+cd C:\Users\NathanK\Documents\Project\MacroBrief\apps\web
 npm run dev
 ```
 
 Run API tests:
 
 ```powershell
-cd C:\Users\kbyun\Documents\MacroBrief
-$env:DOTNET_CLI_HOME='C:\Users\kbyun\Documents\MacroBrief\.dotnet'
+cd C:\Users\NathanK\Documents\Project\MacroBrief
+$env:DOTNET_CLI_HOME='C:\Users\NathanK\Documents\Project\MacroBrief\.dotnet'
 dotnet test apps/api/tests/MacroBrief.Api.Tests/MacroBrief.Api.Tests.csproj
 ```
 
 Run Web tests:
 
 ```powershell
-cd C:\Users\kbyun\Documents\MacroBrief\apps\web
+cd C:\Users\NathanK\Documents\Project\MacroBrief\apps\web
 npm test
 ```
