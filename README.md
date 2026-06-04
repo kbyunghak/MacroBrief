@@ -27,25 +27,17 @@ It maps same-day macro/breaking-news events to your holdings and explains why ea
 - No trading execution
 
 ## Current Implementation Status
-- API scaffold complete (`.NET 9 Minimal API`)
-- Endpoints implemented:
-  - `GET /api/v1/dashboard/summary`
-  - `GET /api/v1/holdings`
-  - `POST /api/v1/holdings`
-  - `DELETE /api/v1/holdings/{symbol}`
-- Codebase refactored from single `Program.cs` into:
-  - `Endpoints`
-  - `Services`
-  - `Contracts`
-  - `Models`
-- Automated tests added (xUnit):
-  - Service unit tests
-  - Endpoint integration tests (`WebApplicationFactory`)
+- Current phase: Step 6 of 7, beta validation instrumentation.
+- API and Web MVP scaffolds are implemented and connected.
+- Holdings, dashboard summary, impact cards, live alerts, macro map, relevance feedback, AI guardrail audit, and KPI event endpoints are available.
+- Next.js dashboard supports holdings management, refresh, live alert polling, source click tracking, and impact feedback.
+- Tests exist for API endpoints and Web utility behavior.
+- Detailed status and roadmap: `docs/PROJECT_STATUS_AND_ROADMAP.md`
 
 ## Tech Stack
-- Frontend: React / Next.js (planned)
+- Frontend: React / Next.js
 - Backend: .NET 9 Web API
-- Testing: xUnit + ASP.NET Core test host
+- Testing: xUnit + ASP.NET Core test host + Vitest
 - DB: PostgreSQL or Supabase (planned)
 - Delivery: PWA-first, native-app extensible architecture
 
@@ -110,14 +102,14 @@ dotnet test apps/api/tests/MacroBrief.Api.Tests/MacroBrief.Api.Tests.csproj
 ```
 
 ## Architecture & Planning Docs
+- Current status and roadmap: `docs/PROJECT_STATUS_AND_ROADMAP.md`
 - Product and MVP: `docs/STEP0_PRD.md`
 - API/ingestion contracts: `docs/STEP2_MAPPING_SPEC.md`, `docs/STEP3_INGESTION_API_SPEC.md`, `docs/openapi.macrobrief.v1.json`
 - AI safety policy: `docs/STEP5_AI_GUARDRAILS_SPEC.md`, `docs/ai_guardrails.v1.json`
+- Beta validation: `docs/STEP6_BETA_VALIDATION_SPEC.md`, `docs/STEP6_WEEK1_BASELINE_RUNBOOK.md`
 - Mobile expansion plan (M0-M7): `docs/STEPM0_*` to `docs/STEPM7_*`
 
 ## Next Implementation Target
-- Expand API with:
-  - `impact-cards`
-  - `live-alerts`
-  - `macro-map`
-- Keep test-first updates for new endpoints and services.
+- Step 6 - 3/4: harden API KPI tests.
+- Step 6 - 4/4: prepare Step 7 handoff and API key readiness docs.
+- Step 7: package MacroBrief as a portfolio/interview-ready project artifact.
