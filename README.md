@@ -168,6 +168,18 @@ Check the active storage mode while the API is running:
 Invoke-RestMethod http://localhost:5221/api/v1/internal/storage
 ```
 
+Check local data file status:
+
+```powershell
+Invoke-RestMethod http://localhost:5221/api/v1/internal/local-data/export
+```
+
+Reset managed local data files:
+
+```powershell
+Invoke-RestMethod -Method Post http://localhost:5221/api/v1/internal/local-data/reset
+```
+
 ## Test
 
 Run API tests:
@@ -183,7 +195,7 @@ cd apps/web
 npm test
 ```
 
-Latest API test result: 44 passing tests.
+Latest API test result: 49 passing tests.
 
 ## Portfolio Docs
 

@@ -36,6 +36,7 @@ else
 builder.Services.AddSingleton<IMappingRulesProvider, JsonMappingRulesProvider>();
 builder.Services.AddSingleton<IPortfolioInsightsService, InMemoryPortfolioInsightsService>();
 builder.Services.AddSingleton<IStorageStatusService, StorageStatusService>();
+builder.Services.AddSingleton<ILocalDataManagementService, LocalDataManagementService>();
 
 var app = builder.Build();
 app.UseCors("WebClient");

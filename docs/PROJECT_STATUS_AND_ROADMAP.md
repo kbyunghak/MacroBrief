@@ -1,6 +1,6 @@
 # MacroBrief Project Status and Roadmap
 
-Last updated: 2026-06-04
+Last updated: 2026-06-05
 
 ## 1. Current Progress
 
@@ -67,7 +67,7 @@ Contracts and docs:
 
 Testing:
 - API endpoint tests with xUnit and WebApplicationFactory
-- Latest API test result: 44 passed, 0 failed
+- Latest API test result: 49 passed, 0 failed
 - Web utility tests with Vitest
 - User confirmed `npm test` passed in `apps/web`
 
@@ -79,6 +79,8 @@ Local API:
 - Can persist personal local data with `MB_STORAGE_MODE=local_json`
 - Local JSON files are stored under `.local-data/`
 - Storage mode can be checked at `GET /api/v1/internal/storage`
+- Local data files can be inspected at `GET /api/v1/internal/local-data/export`
+- Managed local data files can be reset with `POST /api/v1/internal/local-data/reset`
 
 Local Web:
 - Runs on `http://localhost:3000`
@@ -190,7 +192,13 @@ Local-first persistence:
 - stores holdings, relevance feedback, KPI events, and AI audit logs under `.local-data/`
 - local data and local env files are ignored by git
 - storage mode can be checked with `GET /api/v1/internal/storage`
+- local data export/reset endpoints added for demo and development cleanup
 - unit/integration tests cover local JSON persistence and storage status
+- manual local runtime validation complete:
+  - `GET /api/v1/internal/storage` returned `local_json`
+  - holdings persisted across API restart
+  - `POST /api/v1/internal/local-data/reset` deleted managed local files
+  - holdings seed regenerated correctly after reset
 
 Portfolio/database readiness:
 - first persistence schema pass added in `infra/sql/002_beta_persistence.sql`
@@ -198,7 +206,6 @@ Portfolio/database readiness:
 
 ### Recommended Next Implementation Candidates
 
-- local data reset/export endpoint for demo and development cleanup
 - small beta monitoring panel for feedback/KPI status
 - persistent database evaluation only if multi-user deployment becomes necessary
 - auth and per-user data isolation

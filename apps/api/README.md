@@ -43,6 +43,18 @@ Check the active storage mode:
 Invoke-RestMethod http://localhost:5221/api/v1/internal/storage
 ```
 
+Check local data file status:
+
+```powershell
+Invoke-RestMethod http://localhost:5221/api/v1/internal/local-data/export
+```
+
+Reset managed local data files:
+
+```powershell
+Invoke-RestMethod -Method Post http://localhost:5221/api/v1/internal/local-data/reset
+```
+
 ## API Key Readiness
 
 Future provider placeholders are listed in `apps/api/.env.example`:
