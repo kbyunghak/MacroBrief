@@ -3,13 +3,14 @@ import type {
   DashboardSummary,
   Holding,
   ImpactCard,
+  BetaStatus,
+  KpiEventRequest,
   LiveAlert,
   MacroMapItem,
-  RelevanceFeedbackRequest,
-  KpiEventRequest
+  RelevanceFeedbackRequest
 } from "../types/api";
 
-const API_BASE_URL = (process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:5000").replace(/\/+$/, "");
+const API_BASE_URL = (process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:5221").replace(/\/+$/, "");
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(`${API_BASE_URL}${path}`, {
@@ -20,14 +21,15 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
     }
   });
 
-  const payload = (await response.json()) as ApiResponse<T>;
-  if (!response.ok || payload.error) {
-    const code = payload.error?.code ?? "request_failed";
-    const message = payload.error?.message ?? `Request failed with status ${response.status}`;
+  const body = await response.text();
+  const payload = body ? (JSON.parse(body) as ApiResponse<T>) : null;
+  if (!response.ok || payload?.error) {
+    const code = payload?.error?.code ?? "request_failed";
+    const message = payload?.error?.message ?? `Request failed with status ${response.status}`;
     throw new Error(`${code}: ${message}`);
   }
 
-  if (payload.data === null) {
+  if (payload === null || payload.data === null) {
     throw new Error("invalid_response: response data was null");
   }
 
@@ -77,5 +79,8 @@ export const apiClient = {
       method: "POST",
       body: JSON.stringify(input)
     });
+  },
+  getBetaStatus() {
+    return request<BetaStatus>("/api/v1/internal/beta/status");
   }
 };

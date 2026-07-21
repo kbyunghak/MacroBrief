@@ -7,7 +7,8 @@ import { buildRefreshNotice, getFailuresCount, normalizeHoldingsErrorMessage } f
 import { emitKpiEvent } from "../lib/kpi-events";
 import { ImpactCardsClient } from "./ImpactCardsClient";
 import { LiveAlertsClient } from "./LiveAlertsClient";
-import type { DashboardSummary, Holding, ImpactCard, LiveAlert, MacroMapItem } from "../types/api";
+import { BetaMonitoringPanel } from "./BetaMonitoringPanel";
+import type { BetaStatus, DashboardSummary, Holding, ImpactCard, LiveAlert, MacroMapItem } from "../types/api";
 import { useEffect } from "react";
 
 type Props = {
@@ -16,6 +17,7 @@ type Props = {
   initialImpactCards: ImpactCard[];
   initialLiveAlerts: LiveAlert[];
   initialMacroMap: MacroMapItem[];
+  initialBetaStatus: BetaStatus;
 };
 
 export function DashboardClient({
@@ -23,7 +25,8 @@ export function DashboardClient({
   initialHoldings,
   initialImpactCards,
   initialLiveAlerts,
-  initialMacroMap
+  initialMacroMap,
+  initialBetaStatus
 }: Props) {
   useEffect(() => {
     void emitKpiEvent("app_open");
@@ -33,6 +36,7 @@ export function DashboardClient({
   const [impactCards, setImpactCards] = useState(initialImpactCards);
   const [liveAlerts, setLiveAlerts] = useState(initialLiveAlerts);
   const [macroMap, setMacroMap] = useState(initialMacroMap);
+  const [betaStatus, setBetaStatus] = useState(initialBetaStatus);
 
   const [newSymbol, setNewSymbol] = useState("");
   const [holdingsBusy, setHoldingsBusy] = useState(false);
@@ -51,12 +55,13 @@ export function DashboardClient({
   const lastUpdatedLabel = formatSummaryUpdatedLabel(summary.lastUpdatedAt);
 
   async function refreshAll() {
-    const [nextSummary, nextHoldings, nextImpactCards, nextLiveAlerts, nextMacroMap] = await Promise.allSettled([
+    const [nextSummary, nextHoldings, nextImpactCards, nextLiveAlerts, nextMacroMap, nextBetaStatus] = await Promise.allSettled([
       apiClient.getDashboardSummary(),
       apiClient.getHoldings(),
       apiClient.getImpactCards(),
       apiClient.getLiveAlerts(10),
-      apiClient.getMacroMap()
+      apiClient.getMacroMap(),
+      apiClient.getBetaStatus()
     ]);
 
     if (nextSummary.status === "fulfilled") {
@@ -93,6 +98,12 @@ export function DashboardClient({
       insightsFailures.push("macro map");
     }
 
+    if (nextBetaStatus.status === "fulfilled") {
+      setBetaStatus(nextBetaStatus.value);
+    } else {
+      insightsFailures.push("beta monitoring");
+    }
+
     if (insightsFailures.length > 0) {
       setInsightsError(`Failed to refresh ${insightsFailures.join(", ")}. Showing last data.`);
     } else {
@@ -104,7 +115,8 @@ export function DashboardClient({
       nextHoldings.status,
       nextImpactCards.status,
       nextLiveAlerts.status,
-      nextMacroMap.status
+      nextMacroMap.status,
+      nextBetaStatus.status
     ]);
     setRefreshNotice(buildRefreshNotice(failuresCount));
   }
@@ -271,6 +283,8 @@ export function DashboardClient({
           ))}
         </ul>
       </section>
+
+      <BetaMonitoringPanel status={betaStatus} />
     </main>
   );
 }

@@ -77,3 +77,67 @@ export type KpiEventRequest = {
   sourceUrl?: string;
   meta?: Record<string, string>;
 };
+
+export type StorageStatus = {
+  mode: string;
+  localDataDirectory: string | null;
+  localDataDirectoryExists: boolean;
+};
+
+export type KpiEventsSummary = {
+  totalEvents: number;
+  eventTypeCounts: Record<string, number>;
+  latestOccurredAtUtc: string | null;
+};
+
+export type BetaWeeklyRollup = {
+  weekStartDate: string;
+  cohortSize: number;
+  weeklyActiveUsers: number;
+  d7RetentionRate: number;
+  feedbackSampleSize: number;
+  relevancePositiveRatio: number;
+  alertClickThroughRate: number;
+  sourceClickRate: number;
+  explanationPolicyViolationRate: number;
+  kpiHealth: string;
+  recommendation: string;
+  falseRelevanceRate: number;
+  duplicateAlertRate: number;
+  missingSourceRate: number;
+  topFeedbackThemes: string[];
+  ruleVersion: string;
+  notes: string | null;
+};
+
+export type AiAuditSummary = {
+  windowSize: number;
+  totalLogs: number;
+  fallbackUsedCount: number;
+  fallbackRate: number;
+  fallbackRateLevel: string;
+  fallbackRateWarning: boolean;
+  blockedTermDetections: number;
+  topBlockedTerms: string[];
+  topFailureCodes: string[];
+};
+
+export type LocalDataFileStatus = {
+  name: string;
+  sizeBytes: number;
+  lastModifiedUtc: string;
+};
+
+export type LocalDataExport = {
+  mode: string;
+  localDataDirectory: string | null;
+  files: LocalDataFileStatus[];
+};
+
+export type BetaStatus = {
+  storage: StorageStatus;
+  eventSummary: KpiEventsSummary;
+  weeklyRollup: BetaWeeklyRollup;
+  aiAuditSummary: AiAuditSummary;
+  localData: LocalDataExport;
+};
