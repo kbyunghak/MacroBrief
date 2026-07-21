@@ -1,10 +1,10 @@
 # MacroBrief Project Status and Roadmap
 
-Last updated: 2026-06-05
+Last updated: 2026-07-20
 
 ## 1. Current Progress
 
-Current phase: Post-Step 7 local-first persistence
+Current phase: Step 8 macro-first prototype and documentation alignment
 
 Step 6 progress:
 - 1/4 KPI insufficient data handling: complete
@@ -22,6 +22,7 @@ Overall status:
 - Step 6 beta validation: complete
 - Step 7 portfolio packaging: complete
 - Post-Step 7 local-first persistence: in progress
+- Step 8 macro-first prototype and documentation alignment: in progress
 
 ## 2. What Is Implemented
 
@@ -42,7 +43,11 @@ API:
 
 Web:
 - Next.js dashboard app
-- API-backed dashboard rendering
+- Macro-first mock dashboard prototype
+- Market signal strip, Morning Macro Brief cards, holdings table, live alerts, and macro map
+- Related holdings displayed as ticker chips/buttons
+- Macro cards link out to source pages for details
+- API-backed dashboard components retained for future integration
 - Holdings add/remove flow
 - Manual dashboard refresh
 - Live Alerts polling and focus refresh
@@ -52,6 +57,8 @@ Web:
 - Web unit tests with Vitest
 
 Contracts and docs:
+- Product requirements: `docs/STEP0_PRD.md`
+- Product requirements Korean companion: `docs/STEP0_PRD.ko.md`
 - OpenAPI draft: `docs/openapi.macrobrief.v1.json`
 - Mapping rules: `docs/mapping_rules.v1.json`
 - AI guardrails: `docs/ai_guardrails.v1.json`
@@ -67,7 +74,8 @@ Contracts and docs:
 
 Testing:
 - API endpoint tests with xUnit and WebApplicationFactory
-- Latest API test result: 49 passed, 0 failed
+- Latest API test result: 52 passed, 0 failed
+- Latest Web type check result: `npx tsc --noEmit` passed
 - Web utility tests with Vitest
 - User confirmed `npm test` passed in `apps/web`
 
@@ -81,6 +89,7 @@ Local API:
 - Storage mode can be checked at `GET /api/v1/internal/storage`
 - Local data files can be inspected at `GET /api/v1/internal/local-data/export`
 - Managed local data files can be reset with `POST /api/v1/internal/local-data/reset`
+- Beta status can be checked at `GET /api/v1/internal/beta/status`
 
 Local Web:
 - Runs on `http://localhost:3000`
@@ -200,13 +209,42 @@ Local-first persistence:
   - `POST /api/v1/internal/local-data/reset` deleted managed local files
   - holdings seed regenerated correctly after reset
 
+Beta monitoring:
+- combined beta status API added at `GET /api/v1/internal/beta/status`
+- Web dashboard beta monitoring panel added
+- panel shows storage mode, local file count, KPI health, recommendation, event counts, feedback ratio, AI fallback rate, and engagement rates
+
+Macro-first prototype:
+- current Web first screen changed to mock-data macro dashboard
+- macro cards are primary; holdings are secondary ticker chips
+- source links are the detail path instead of building a news-reader UI
+
+Documentation alignment:
+- English documentation is the canonical implementation reference
+- Korean companion documentation should use the `.ko.md` suffix
+- PRD v2 now documents the macro-first product direction
+- `docs/STEP0_PRD.ko.md` provides the Korean companion version
+- Web UI language packs are organized under `apps/web/src/i18n`
+- Current Web locale packs: `en`, `ko`
+- The macro-first dashboard defaults to English and provides a top navigation `EN/KO` language switch
+- Documentation and language files should be stored as UTF-8
+
+Recommended commit checkpoints:
+- Checkpoint A: macro-first dashboard prototype, PRD v2, documentation language policy, and first-screen `en/ko` language packs
+- Checkpoint B: responsive UI polish and runtime smoke test
+- Checkpoint C: mock data module cleanup and selected API-backed reintegration
+- Checkpoint D: provider interface preparation before adding real external data keys
+
 Portfolio/database readiness:
 - first persistence schema pass added in `infra/sql/002_beta_persistence.sql`
 - future provider/API key placeholders documented without committing real secrets
 
 ### Recommended Next Implementation Candidates
 
-- small beta monitoring panel for feedback/KPI status
+- commit and upload the current macro-first prototype/documentation baseline
+- run Web runtime smoke test for macro-first prototype
+- polish responsive layout and visual details
+- decide when to reintroduce API-backed data into the prototype
 - persistent database evaluation only if multi-user deployment becomes necessary
 - auth and per-user data isolation
 - real news/market data ingestion

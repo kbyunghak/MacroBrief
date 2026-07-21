@@ -1,6 +1,6 @@
 # MacroBrief
 
-MacroBrief is a portfolio-specific macro-impact dashboard for U.S. stock holdings. It maps same-day macro and breaking-news events to user-selected holdings, then explains why each event may matter using rule-based relevance mapping and AI-assisted safety guardrails.
+MacroBrief is a portfolio-specific macro-impact dashboard for U.S. stock holdings. The current Web prototype is macro-first: it shows macro themes first, related holdings as ticker chips, and source links for deeper context.
 
 ## Problem
 
@@ -16,14 +16,14 @@ Investors can access endless market headlines, but most news products do not ans
 
 ## MVP Features
 
-- Add and remove holdings/watchlist tickers
-- Render a dashboard summary backed by the API
-- Show Morning Macro Brief, impact cards, live alerts, and macro map sections
-- Map macro categories to holdings exposure paths
-- Generate guarded "why it matters" explanations
-- Track relevance feedback and source-click events
-- Produce beta KPI summaries and weekly rollups
-- Audit AI explanation guardrails and fallback behavior
+- Macro-first dashboard prototype with mock data
+- Market signal strip for futures, yield, oil, dollar, and portfolio mood
+- Morning Macro Brief cards with related holdings as ticker chips
+- Holdings table showing the main macro theme for each ticker
+- Live Portfolio Alerts focused on portfolio relevance
+- Macro Map linking themes to holdings
+- Source links on macro cards for deeper detail
+- API-backed beta/local persistence infrastructure preserved for later integration
 
 ## What MacroBrief Does Not Do
 
@@ -86,13 +86,13 @@ Primary guardrail docs:
 
 ```text
 MacroBrief/
-├─ apps/
-│  ├─ api/      .NET 9 API, contracts, endpoints, services, tests
-│  └─ web/      Next.js dashboard, API client, components, utility tests
-├─ docs/        PRD, specs, guardrails, roadmap, portfolio packaging docs
-├─ infra/       SQL migration baseline
-├─ shared/      shared beta KPI contracts
-└─ README.md
++-- apps/
+|   +-- api/      .NET 9 API, contracts, endpoints, services, tests
+|   +-- web/      Next.js dashboard, API client, components, utility tests
++-- docs/        PRD, specs, guardrails, roadmap, portfolio packaging docs
++-- infra/       SQL migration baseline
++-- shared/      shared beta KPI contracts
++-- README.md
 ```
 
 ## Current Status
@@ -105,11 +105,13 @@ MacroBrief/
 - Step 5 AI guardrails: complete
 - Step 6 beta validation: complete
 - Step 7 portfolio packaging: complete
+- Step 8 macro-first prototype and documentation alignment: in progress
 
 Implemented surfaces:
-- API and Web MVP scaffolds are connected
+- API and Web MVP scaffolds are available
+- Current Web first screen uses a macro-first mock dashboard prototype
 - Holdings, dashboard summary, impact cards, live alerts, macro map, relevance feedback, AI guardrail audit, and KPI event endpoints are available
-- Web dashboard supports holdings management, refresh, live alert polling, source click tracking, and impact feedback
+- Prior API-backed dashboard components remain available for future integration
 - API tests and Web utility tests are in place
 
 Known MVP boundaries:
@@ -195,16 +197,34 @@ cd apps/web
 npm test
 ```
 
-Latest API test result: 49 passing tests.
+Latest API test result: 52 passing tests.
+Latest Web type check result: `npx tsc --noEmit` passed.
 
 ## Portfolio Docs
 
+- Product requirements: `docs/STEP0_PRD.md`
+- Product requirements Korean companion: `docs/STEP0_PRD.ko.md`
 - Current status and roadmap: `docs/PROJECT_STATUS_AND_ROADMAP.md`
 - Architecture summary: `docs/PORTFOLIO_ARCHITECTURE_SUMMARY.md`
 - Demo walkthrough: `docs/PORTFOLIO_DEMO_WALKTHROUGH.md`
 - Safety/compliance summary: `docs/PORTFOLIO_SAFETY_COMPLIANCE_SUMMARY.md`
 - Resume/LinkedIn project description: `docs/PORTFOLIO_RESUME_LINKEDIN_DESCRIPTION.md`
 - Step 6 handoff/API key readiness: `docs/STEP6_HANDOFF_AND_API_KEY_READINESS.md`
+
+Documentation language policy:
+- English `.md` files are the canonical implementation reference.
+- Korean companion docs use the `.ko.md` suffix when needed.
+- Example: `docs/STEP0_PRD.md` and `docs/STEP0_PRD.ko.md`.
+- Store documentation and language files as UTF-8.
+- Web UI copy lives under `apps/web/src/i18n`.
+- The current supported Web locales are `en` and `ko`.
+- The macro-first dashboard defaults to English and includes a top navigation language switch for `EN` and `KO`.
+
+Useful internal endpoints:
+- Storage status: `GET /api/v1/internal/storage`
+- Local data export: `GET /api/v1/internal/local-data/export`
+- Local data reset: `POST /api/v1/internal/local-data/reset`
+- Beta status: `GET /api/v1/internal/beta/status`
 
 ## Future Improvements
 
