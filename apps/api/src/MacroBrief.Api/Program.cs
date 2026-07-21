@@ -37,6 +37,7 @@ builder.Services.AddSingleton<IMappingRulesProvider, JsonMappingRulesProvider>()
 builder.Services.AddSingleton<IPortfolioInsightsService, InMemoryPortfolioInsightsService>();
 builder.Services.AddSingleton<IStorageStatusService, StorageStatusService>();
 builder.Services.AddSingleton<ILocalDataManagementService, LocalDataManagementService>();
+builder.Services.AddSingleton<IBetaStatusService, BetaStatusService>();
 
 var app = builder.Build();
 app.UseCors("WebClient");
@@ -53,6 +54,7 @@ app.MapFeedbackEndpoints();
 app.MapAiGuardrailsEndpoints();
 app.MapKpiEventsEndpoints();
 app.MapSystemEndpoints();
+app.MapBetaStatusEndpoints();
 
 app.Run();
 

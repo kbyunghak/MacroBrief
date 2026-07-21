@@ -55,6 +55,16 @@ Reset managed local data files:
 Invoke-RestMethod -Method Post http://localhost:5221/api/v1/internal/local-data/reset
 ```
 
+## Beta Status
+
+The API exposes a combined beta status endpoint for the Web dashboard:
+
+```powershell
+Invoke-RestMethod http://localhost:5221/api/v1/internal/beta/status
+```
+
+It combines storage status, KPI event summary, weekly rollup, AI audit summary, and local data file status.
+
 ## API Key Readiness
 
 Future provider placeholders are listed in `apps/api/.env.example`:
