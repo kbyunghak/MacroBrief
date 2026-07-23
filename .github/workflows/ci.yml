@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  quality-gate:
+    name: Quality gate
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+
+      - name: Run API tests
+        run: dotnet test apps/api/tests/MacroBrief.Api.Tests/MacroBrief.Api.Tests.csproj --configuration Release
+
+      - name: Install Web dependencies
+        working-directory: apps/web
+        run: npm ci
+
+      - name: Run Web unit tests
+        working-directory: apps/web
+        run: npm test
+
+      - name: Run Web type check
+        working-directory: apps/web
+        run: npx tsc --noEmit
+
+      - name: Build Web static demo
+        working-directory: apps/web
+        env:
+          GITHUB_PAGES: "true"
+        run: npm run build
