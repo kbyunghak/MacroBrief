@@ -13,6 +13,12 @@ export const koMessages = {
     holdings: "보유종목",
     recap: "요약"
   },
+  demoStatus: {
+    mockData: "모의 데이터",
+    staticDemo: "정적 데모",
+    updatedLabel: "업데이트",
+    updatedAtUtc: "2026-07-23 00:00 UTC"
+  },
   signals: {
     ariaLabel: "시장 신호",
     items: [

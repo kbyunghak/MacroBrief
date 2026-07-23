@@ -65,6 +65,14 @@ export function MacroFirstDashboard() {
         </div>
       </header>
 
+      <section className="demo-status-strip" aria-label="Demo status">
+        <span>{copy.demoStatus.mockData}</span>
+        <span>{copy.demoStatus.staticDemo}</span>
+        <span>
+          {copy.demoStatus.updatedLabel}: {copy.demoStatus.updatedAtUtc}
+        </span>
+      </section>
+
       <section className="signal-strip" aria-label={copy.signals.ariaLabel}>
         {copy.signals.items.map((signal) => (
           <article className="signal-card" key={signal.label}>

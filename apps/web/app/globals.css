@@ -207,6 +207,35 @@ th {
   white-space: nowrap;
 }
 
+.demo-status-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  padding: 10px 12px;
+  box-shadow: none;
+}
+
+.demo-status-strip span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  padding: 0 10px;
+  color: #344054;
+  font-size: 12px;
+  font-weight: 800;
+  background: var(--panel-soft);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+}
+
+.demo-status-strip span:first-child {
+  color: var(--orange);
+  background: var(--orange-soft);
+  border-color: #fed7aa;
+}
+
 .signal-strip {
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));

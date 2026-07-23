@@ -16,6 +16,12 @@ export type DashboardMessages = {
     holdings: string;
     recap: string;
   };
+  demoStatus: {
+    mockData: string;
+    staticDemo: string;
+    updatedLabel: string;
+    updatedAtUtc: string;
+  };
   signals: {
     ariaLabel: string;
     items: Array<{
@@ -92,6 +98,12 @@ export const enMessages = {
     alerts: "Alerts",
     holdings: "Holdings",
     recap: "Recap"
+  },
+  demoStatus: {
+    mockData: "MOCK DATA",
+    staticDemo: "STATIC DEMO",
+    updatedLabel: "Updated",
+    updatedAtUtc: "2026-07-23 00:00 UTC"
   },
   signals: {
     ariaLabel: "Market signals",
