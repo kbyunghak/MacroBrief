@@ -2,6 +2,18 @@
 
 MacroBrief is a portfolio-specific macro-impact dashboard for U.S. stock holdings. The current Web prototype is macro-first: it shows macro themes first, related holdings as ticker chips, and source links for deeper context.
 
+## Public Demo
+
+Live demo:
+`https://kbyunghak.github.io/MacroBrief/`
+
+Demo status:
+- Static GitHub Pages demo
+- Mock data only
+- No real news or market data provider is connected yet
+- Real News MVP is the next implementation priority
+- Information only, not investment advice
+
 ## Problem
 
 Investors can access endless market headlines, but most news products do not answer the more practical question: "Does this matter to my holdings?" MacroBrief narrows the daily information stream to portfolio-relevant macro context without making investment recommendations.
@@ -197,8 +209,33 @@ cd apps/web
 npm test
 ```
 
+Run Web type check:
+
+```powershell
+cd apps/web
+npx tsc --noEmit
+```
+
+Run Web static build:
+
+```powershell
+cd apps/web
+npm run build
+```
+
 Latest API test result: 52 passing tests.
 Latest Web type check result: `npx tsc --noEmit` passed.
+
+## CI/CD
+
+GitHub Actions workflows:
+- `CI`: runs API tests, Web dependency install, Web unit tests, TypeScript check, and static Web build.
+- `Deploy Web Demo`: builds `apps/web` as a static Next.js export and deploys `apps/web/out` to GitHub Pages.
+
+GitHub Pages deployment expects:
+- Pages source: GitHub Actions
+- Demo URL: `https://kbyunghak.github.io/MacroBrief/`
+- Build mode: static export with `/MacroBrief` base path
 
 ## Portfolio Docs
 
